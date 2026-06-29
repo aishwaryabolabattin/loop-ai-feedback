@@ -16,7 +16,8 @@ model User {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
-  role      String
+  password  String
+  role      String   @default("VIEWER")
   createdAt DateTime @default(now())
 
   feedbacks Feedback[]
