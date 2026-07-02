@@ -11,18 +11,27 @@ async function main() {
   const analystPassword = await bcrypt.hash("analyst123", 10);
   const viewerPassword = await bcrypt.hash("viewer123", 10);
 
-  // Create Workspace
-  const workspace = await prisma.workspace.create({
-    data: {
+  // Workspace
+  const workspace = await prisma.workspace.upsert({
+    where: {
+      id: 1,
+    },
+    update: {},
+    create: {
+      id: 1,
       name: "Project LOOP Workspace",
     },
   });
 
-  console.log("✅ Workspace Created");
+  console.log("✅ Workspace Ready");
 
-  // Create Admin
-  const admin = await prisma.user.create({
-    data: {
+  // Admin
+  const admin = await prisma.user.upsert({
+    where: {
+      email: "admin@loop.dev",
+    },
+    update: {},
+    create: {
       name: "Aishwarya",
       email: "admin@loop.dev",
       password: adminPassword,
@@ -31,9 +40,13 @@ async function main() {
     },
   });
 
-  // Create Analyst
-  const analyst = await prisma.user.create({
-    data: {
+  // Analyst
+  const analyst = await prisma.user.upsert({
+    where: {
+      email: "analyst@loop.dev",
+    },
+    update: {},
+    create: {
       name: "Nasiroddin",
       email: "analyst@loop.dev",
       password: analystPassword,
@@ -42,9 +55,13 @@ async function main() {
     },
   });
 
-  // Create Viewer
-  const viewer = await prisma.user.create({
-    data: {
+  // Viewer
+  const viewer = await prisma.user.upsert({
+    where: {
+      email: "viewer@loop.dev",
+    },
+    update: {},
+    create: {
       name: "Viewer User",
       email: "viewer@loop.dev",
       password: viewerPassword,
@@ -53,42 +70,49 @@ async function main() {
     },
   });
 
-  console.log("✅ Users Created");
+  console.log("✅ Users Ready");
 
-  // Create Sample Feedback
-  await prisma.feedback.createMany({
-    data: [
-      {
-        message: "Excellent customer support.",
-        sentiment: "POSITIVE",
-        status: "NEW",
-        theme: "Support",
-        channel: "Email",
-        workspaceId: workspace.id,
-        userId: admin.id,
-      },
-      {
-        message: "Delivery was delayed.",
-        sentiment: "NEGATIVE",
-        status: "REVIEW",
-        theme: "Delivery",
-        channel: "Website",
-        workspaceId: workspace.id,
-        userId: analyst.id,
-      },
-      {
-        message: "Application UI is very clean.",
-        sentiment: "POSITIVE",
-        status: "ACTIONED",
-        theme: "UI",
-        channel: "Mobile",
-        workspaceId: workspace.id,
-        userId: viewer.id,
-      },
-    ],
-  });
+  // Check if feedback already exists
+  const feedbackCount = await prisma.feedback.count();
 
-  console.log("✅ Feedback Created");
+  if (feedbackCount === 0) {
+    await prisma.feedback.createMany({
+      data: [
+        {
+          message: "Excellent customer support.",
+          sentiment: "POSITIVE",
+          status: "NEW",
+          theme: "Support",
+          channel: "Email",
+          workspaceId: workspace.id,
+          userId: admin.id,
+        },
+        {
+          message: "Delivery was delayed.",
+          sentiment: "NEGATIVE",
+          status: "REVIEW",
+          theme: "Delivery",
+          channel: "Website",
+          workspaceId: workspace.id,
+          userId: analyst.id,
+        },
+        {
+          message: "Application UI is very clean.",
+          sentiment: "POSITIVE",
+          status: "ACTIONED",
+          theme: "UI",
+          channel: "Mobile",
+          workspaceId: workspace.id,
+          userId: viewer.id,
+        },
+      ],
+    });
+
+    console.log("✅ Feedback Created");
+  } else {
+    console.log("ℹ️ Feedback already exists");
+  }
+
   console.log("🎉 Database Seeded Successfully");
 }
 
