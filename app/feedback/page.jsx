@@ -1,8 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Sidebar from "@/components/Sidebar";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import FeedbackHeader from "@/components/FeedbackHeader";
+import FeedbackStats from "@/components/FeedbackStats";
+import FeedbackSearch from "@/components/FeedbackSearch";
+import FeedbackForm from "@/components/FeedbackForm";
+import FeedbackTable from "@/components/FeedbackTable";
+import FeedbackBadge from "@/components/FeedbackBadge";
 
 export default function FeedbackPage() {
+  // ===========================
+  // States
+  // ===========================
+
   const [feedback, setFeedback] = useState([]);
 
   const [form, setForm] = useState({
@@ -13,115 +26,269 @@ export default function FeedbackPage() {
     channel: "",
   });
 
+  const [search, setSearch] = useState("");
+  const [sentiment, setSentiment] = useState("");
+  const [status, setStatus] = useState("");
+  const [date, setDate] = useState("");
+
+  // ===========================
+  // Load Feedback
+  // ===========================
+
   const loadFeedback = async () => {
-    const res = await fetch("/api/feedback");
-    const data = await res.json();
-    setFeedback(data);
+    try {
+      const res = await fetch("/api/feedback");
+      const data = await res.json();
+
+      setFeedback(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
     loadFeedback();
   }, []);
 
+  // ===========================
+  // Add Feedback
+  // ===========================
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await fetch("/api/feedback", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
+    try {
+      await fetch("/api/feedback", {
+        method: "POST",
 
-    setForm({
-      message: "",
-      sentiment: "",
-      status: "",
-      theme: "",
-      channel: "",
-    });
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-    loadFeedback();
+        body: JSON.stringify(form),
+      });
+
+      setForm({
+        message: "",
+        sentiment: "",
+        status: "",
+        theme: "",
+        channel: "",
+      });
+
+      loadFeedback();
+
+      alert("Feedback Added Successfully");
+    } catch (error) {
+      console.log(error);
+
+      alert("Something went wrong.");
+    }
   };
 
+  // ===========================
+  // Reset Filters
+  // ===========================
+
+  const resetFilters = () => {
+    setSearch("");
+    setSentiment("");
+    setStatus("");
+    setDate("");
+  };
+
+  // ===========================
+  // Filter Feedback
+  // ===========================
+
+  const filteredFeedback = feedback.filter((item) => {
+    const searchMatch =
+      item.message?.toLowerCase().includes(search.toLowerCase()) ||
+      item.theme?.toLowerCase().includes(search.toLowerCase());
+
+    const sentimentMatch = sentiment === "" || item.sentiment === sentiment;
+
+    const statusMatch = status === "" || item.status === status;
+
+    const dateMatch =
+      date === "" ||
+      new Date(item.createdAt).toISOString().split("T")[0] === date;
+
+    return searchMatch && sentimentMatch && statusMatch && dateMatch;
+  });
   return (
-    <div style={{ padding: 40 }}>
-      <h1>Customer Feedback</h1>
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+      }}
+    >
+      <Sidebar />
 
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="Message"
-          value={form.message}
-          onChange={(e) => setForm({ ...form, message: e.target.value })}
-        />
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Header />
 
-        <br />
-        <br />
-
-        <input
-          placeholder="Sentiment"
-          value={form.sentiment}
-          onChange={(e) => setForm({ ...form, sentiment: e.target.value })}
-        />
-
-        <br />
-        <br />
-
-        <input
-          placeholder="Status"
-          value={form.status}
-          onChange={(e) => setForm({ ...form, status: e.target.value })}
-        />
-
-        <br />
-        <br />
-
-        <input
-          placeholder="Theme"
-          value={form.theme}
-          onChange={(e) => setForm({ ...form, theme: e.target.value })}
-        />
-
-        <br />
-        <br />
-
-        <input
-          placeholder="Channel"
-          value={form.channel}
-          onChange={(e) => setForm({ ...form, channel: e.target.value })}
-        />
-
-        <br />
-        <br />
-
-        <button type="submit">Add Feedback</button>
-      </form>
-
-      <hr />
-
-      <h2>Feedback List</h2>
-
-      {feedback.map((item) => (
-        <div
-          key={item.id}
+        <main
           style={{
-            border: "1px solid gray",
-            marginBottom: 10,
-            padding: 10,
+            flex: 1,
+            background: "#F3F4F6",
+            padding: "30px",
           }}
         >
-          <h4>{item.message}</h4>
+          {/* ============================= */}
+          {/* Feedback Header */}
+          {/* ============================= */}
 
-          <p>Theme: {item.theme}</p>
+          <FeedbackHeader
+            total={feedback.length}
+            onAddFeedback={() => {
+              window.scrollTo({
+                top: 600,
+                behavior: "smooth",
+              });
+            }}
+          />
 
-          <p>Channel: {item.channel}</p>
+          {/* ============================= */}
+          {/* Statistics Cards */}
+          {/* ============================= */}
 
-          <p>Status: {item.status}</p>
+          <FeedbackStats
+            total={feedback.length}
+            positive={
+              feedback.filter((item) => item.sentiment === "POSITIVE").length
+            }
+            negative={
+              feedback.filter((item) => item.sentiment === "NEGATIVE").length
+            }
+            pending={feedback.filter((item) => item.status === "NEW").length}
+          />
 
-          <p>Sentiment: {item.sentiment}</p>
-        </div>
-      ))}
+          {/* ============================= */}
+          {/* Search & Filters */}
+          {/* ============================= */}
+
+          <FeedbackSearch
+            search={search}
+            setSearch={setSearch}
+            sentiment={sentiment}
+            setSentiment={setSentiment}
+            status={status}
+            setStatus={setStatus}
+            date={date}
+            setDate={setDate}
+            resetFilters={resetFilters}
+          />
+
+          {/* ============================= */}
+          {/* Page Heading */}
+          {/* ============================= */}
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "25px",
+            }}
+          >
+            <div>
+              <h2
+                style={{
+                  margin: 0,
+                  color: "#111827",
+                  fontSize: "28px",
+                  fontWeight: "700",
+                }}
+              >
+                Customer Feedback Management
+              </h2>
+
+              <p
+                style={{
+                  marginTop: "8px",
+                  color: "#6B7280",
+                }}
+              >
+                Create, manage and analyze customer feedback.
+              </p>
+            </div>
+
+            <div
+              style={{
+                background: "#4F46E5",
+                color: "#fff",
+                padding: "12px 20px",
+                borderRadius: "12px",
+                fontWeight: "700",
+                boxShadow: "0 8px 20px rgba(79,70,229,.3)",
+              }}
+            >
+              {filteredFeedback.length} Records Found
+            </div>
+          </div>
+          {/* ============================= */}
+          {/* Add Feedback Form */}
+          {/* ============================= */}
+
+          <FeedbackForm
+            form={form}
+            setForm={setForm}
+            handleSubmit={handleSubmit}
+          />
+
+          <div style={{ height: "30px" }} />
+
+          {/* ============================= */}
+          {/* Feedback Table */}
+          {/* ============================= */}
+
+          <FeedbackTable
+            feedback={filteredFeedback}
+            onView={(item) => {
+              alert(
+                `Customer: ${item.user?.name || "Unknown"}\n\n` +
+                  `Message: ${item.message}\n\n` +
+                  `Theme: ${item.theme}\n\n` +
+                  `Channel: ${item.channel}\n\n` +
+                  `Status: ${item.status}\n\n` +
+                  `Sentiment: ${item.sentiment}`,
+              );
+            }}
+            onEdit={(item) => {
+              setForm({
+                message: item.message,
+                sentiment: item.sentiment,
+                status: item.status,
+                theme: item.theme,
+                channel: item.channel,
+              });
+
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
+            }}
+            onDelete={(id) => {
+              const confirmDelete = window.confirm(
+                "Are you sure you want to delete this feedback?",
+              );
+
+              if (!confirmDelete) return;
+
+              alert("Delete API is not implemented yet.\n\nFeedback ID: " + id);
+            }}
+          />
+        </main>
+
+        <Footer />
+      </div>
     </div>
   );
 }

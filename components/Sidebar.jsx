@@ -23,15 +23,21 @@ export default function Sidebar() {
       link: "/upload",
     },
     {
-      title: "Members",
-      icon: "👥",
-      link: "/members",
+      title: "Simulator",
+      icon: "🚀",
+      link: "/simulator",
     },
     {
       title: "Analytics",
       icon: "📈",
       link: "/analytics",
     },
+    {
+      title: "Members",
+      icon: "👥",
+      link: "/members",
+    },
+
     {
       title: "Reports",
       icon: "📄",
