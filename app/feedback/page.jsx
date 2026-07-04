@@ -10,6 +10,7 @@ import FeedbackSearch from "@/components/FeedbackSearch";
 import FeedbackForm from "@/components/FeedbackForm";
 import FeedbackTable from "@/components/FeedbackTable";
 import FeedbackBadge from "@/components/FeedbackBadge";
+import Pagination from "@/components/Pagination";
 
 export default function FeedbackPage() {
   // ===========================
@@ -31,16 +32,25 @@ export default function FeedbackPage() {
   const [status, setStatus] = useState("");
   const [date, setDate] = useState("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [editingId, setEditingId] = useState(null);
   // ===========================
   // Load Feedback
   // ===========================
 
   const loadFeedback = async () => {
     try {
-      const res = await fetch("/api/feedback");
+      const res = await fetch(
+        `/api/feedback?page=${currentPage}&limit=10&search=${search}`,
+      );
       const data = await res.json();
 
-      setFeedback(data);
+      setFeedback(data.feedback);
+
+      setTotalPages(data.totalPages);
     } catch (error) {
       console.log(error);
     }
@@ -48,7 +58,10 @@ export default function FeedbackPage() {
 
   useEffect(() => {
     loadFeedback();
-  }, []);
+  }, [currentPage, search]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   // ===========================
   // Add Feedback
@@ -59,15 +72,17 @@ export default function FeedbackPage() {
 
     try {
       await fetch("/api/feedback", {
-        method: "POST",
+        method: editingId ? "PUT" : "POST",
 
         headers: {
           "Content-Type": "application/json",
         },
 
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          id: editingId,
+        }),
       });
-
       setForm({
         message: "",
         sentiment: "",
@@ -75,6 +90,7 @@ export default function FeedbackPage() {
         theme: "",
         channel: "",
       });
+      setEditingId(null);
 
       loadFeedback();
 
@@ -101,21 +117,6 @@ export default function FeedbackPage() {
   // Filter Feedback
   // ===========================
 
-  const filteredFeedback = feedback.filter((item) => {
-    const searchMatch =
-      item.message?.toLowerCase().includes(search.toLowerCase()) ||
-      item.theme?.toLowerCase().includes(search.toLowerCase());
-
-    const sentimentMatch = sentiment === "" || item.sentiment === sentiment;
-
-    const statusMatch = status === "" || item.status === status;
-
-    const dateMatch =
-      date === "" ||
-      new Date(item.createdAt).toISOString().split("T")[0] === date;
-
-    return searchMatch && sentimentMatch && statusMatch && dateMatch;
-  });
   return (
     <div
       style={{
@@ -230,7 +231,7 @@ export default function FeedbackPage() {
                 boxShadow: "0 8px 20px rgba(79,70,229,.3)",
               }}
             >
-              {filteredFeedback.length} Records Found
+              {feedback.length} Records Found
             </div>
           </div>
           {/* ============================= */}
@@ -250,7 +251,7 @@ export default function FeedbackPage() {
           {/* ============================= */}
 
           <FeedbackTable
-            feedback={filteredFeedback}
+            feedback={feedback}
             onView={(item) => {
               alert(
                 `Customer: ${item.user?.name || "Unknown"}\n\n` +
@@ -262,6 +263,8 @@ export default function FeedbackPage() {
               );
             }}
             onEdit={(item) => {
+              setEditingId(item.id);
+
               setForm({
                 message: item.message,
                 sentiment: item.sentiment,
@@ -275,14 +278,36 @@ export default function FeedbackPage() {
                 behavior: "smooth",
               });
             }}
-            onDelete={(id) => {
+            onDelete={async (id) => {
               const confirmDelete = window.confirm(
                 "Are you sure you want to delete this feedback?",
               );
 
               if (!confirmDelete) return;
 
-              alert("Delete API is not implemented yet.\n\nFeedback ID: " + id);
+              try {
+                await fetch(`/api/feedback?id=${id}`, {
+                  method: "DELETE",
+                });
+
+                loadFeedback();
+
+                alert("Feedback deleted successfully.");
+              } catch (error) {
+                console.log(error);
+
+                alert("Delete failed.");
+              }
+            }}
+          />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+
+              // Later we'll call:
+              // /api/feedback?page=page
             }}
           />
         </main>

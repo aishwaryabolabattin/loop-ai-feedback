@@ -1,6 +1,7 @@
 "use client";
 
 import FeedbackBadge from "./FeedbackBadge";
+import StatusDropdown from "./StatusDropdown";
 
 export default function FeedbackTable({
   feedback = [],
@@ -188,7 +189,32 @@ export default function FeedbackTable({
                   {/* Status */}
 
                   <td style={td}>
-                    <FeedbackBadge type="status" value={item.status} />
+                    <StatusDropdown
+                      value={item.status}
+                      onChange={async (newStatus) => {
+                        try {
+                          const response = await fetch("/api/feedback", {
+                            method: "PATCH",
+                            headers: {
+                              "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                              id: item.id,
+                              status: newStatus,
+                            }),
+                          });
+
+                          if (!response.ok) {
+                            throw new Error("Failed to update status");
+                          }
+
+                          window.location.reload();
+                        } catch (error) {
+                          console.error(error);
+                          alert("Failed to update feedback status.");
+                        }
+                      }}
+                    />
                   </td>
 
                   {/* Date */}
