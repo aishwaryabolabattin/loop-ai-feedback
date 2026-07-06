@@ -28,9 +28,18 @@ export default function FeedbackPage() {
   });
 
   const [search, setSearch] = useState("");
+
   const [sentiment, setSentiment] = useState("");
+
   const [status, setStatus] = useState("");
-  const [date, setDate] = useState("");
+
+  const [channel, setChannel] = useState("");
+
+  const [theme, setTheme] = useState("");
+
+  const [startDate, setStartDate] = useState("");
+
+  const [endDate, setEndDate] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -44,7 +53,15 @@ export default function FeedbackPage() {
   const loadFeedback = async () => {
     try {
       const res = await fetch(
-        `/api/feedback?page=${currentPage}&limit=10&search=${search}`,
+        `/api/feedback?page=${currentPage}
+  &limit=10
+  &search=${search}
+  &sentiment=${sentiment}
+  &status=${status}
+  &channel=${channel}
+  &theme=${theme}
+  &startDate=${startDate}
+  &endDate=${endDate}`,
       );
       const data = await res.json();
 
@@ -58,10 +75,21 @@ export default function FeedbackPage() {
 
   useEffect(() => {
     loadFeedback();
-  }, [currentPage, search]);
+  }, [
+    currentPage,
+    search,
+    sentiment,
+    status,
+    channel,
+    theme,
+    startDate,
+    endDate,
+  ]);
+
+  // Reset page whenever filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search]);
+  }, [search, sentiment, status, channel, theme, startDate, endDate]);
 
   // ===========================
   // Add Feedback
@@ -108,9 +136,20 @@ export default function FeedbackPage() {
 
   const resetFilters = () => {
     setSearch("");
+
     setSentiment("");
+
     setStatus("");
-    setDate("");
+
+    setChannel("");
+
+    setTheme("");
+
+    setStartDate("");
+
+    setEndDate("");
+
+    setCurrentPage(1);
   };
 
   // ===========================
@@ -182,8 +221,14 @@ export default function FeedbackPage() {
             setSentiment={setSentiment}
             status={status}
             setStatus={setStatus}
-            date={date}
-            setDate={setDate}
+            channel={channel}
+            setChannel={setChannel}
+            theme={theme}
+            setTheme={setTheme}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
             resetFilters={resetFilters}
           />
 

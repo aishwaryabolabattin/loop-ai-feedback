@@ -7,36 +7,78 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
 
     const page = Number(searchParams.get("page")) || 1;
-    const limit = Number(searchParams.get("limit")) || 10;
-    const search = searchParams.get("search") || "";
 
-    const skip = (page - 1) * limit;
+const limit = Number(searchParams.get("limit")) || 10;
 
-    const workspaceId = 1;
+const search = searchParams.get("search") || "";
 
-    const where = {
-      workspaceId,
+const sentiment = searchParams.get("sentiment") || "";
 
-      OR: [
-        {
-          message: {
-            contains: search,
-          },
-        },
+const status = searchParams.get("status") || "";
 
-        {
-          theme: {
-            contains: search,
-          },
-        },
+const channel = searchParams.get("channel") || "";
 
-        {
-          channel: {
-            contains: search,
-          },
-        },
-      ],
-    };
+const theme = searchParams.get("theme") || "";
+
+const startDate = searchParams.get("startDate");
+
+const endDate = searchParams.get("endDate");
+
+const skip = (page - 1) * limit;
+
+const workspaceId = 1;
+
+const where = {
+  workspaceId,
+
+  ...(sentiment && {
+    sentiment,
+  }),
+
+  ...(status && {
+    status,
+  }),
+
+  ...(channel && {
+    channel,
+  }),
+
+  ...(theme && {
+    theme,
+  }),
+
+  ...(startDate &&
+    endDate && {
+      createdAt: {
+        gte: new Date(startDate),
+
+        lte: new Date(endDate),
+      },
+    }),
+
+  OR: [
+    {
+      message: {
+        contains: search,
+        mode: "insensitive",
+      },
+    },
+
+    {
+      theme: {
+        contains: search,
+        mode: "insensitive",
+      },
+    },
+
+    {
+      channel: {
+        contains: search,
+        mode: "insensitive",
+      },
+    },
+  ],
+};
 
     const totalRecords = await prisma.feedback.count({
       where,

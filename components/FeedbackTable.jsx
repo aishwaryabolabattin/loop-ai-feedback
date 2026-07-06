@@ -208,7 +208,7 @@ export default function FeedbackTable({
                             throw new Error("Failed to update status");
                           }
 
-                          window.location.reload();
+                          loadFeedback();
                         } catch (error) {
                           console.error(error);
                           alert("Failed to update feedback status.");

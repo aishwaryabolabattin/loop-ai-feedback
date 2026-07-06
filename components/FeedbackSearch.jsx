@@ -3,12 +3,25 @@
 export default function FeedbackSearch({
   search,
   setSearch,
+
   sentiment,
   setSentiment,
+
   status,
   setStatus,
-  date,
-  setDate,
+
+  channel,
+  setChannel,
+
+  theme,
+  setTheme,
+
+  startDate,
+  setStartDate,
+
+  endDate,
+  setEndDate,
+
   resetFilters,
 }) {
   return (
@@ -34,7 +47,7 @@ export default function FeedbackSearch({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "2fr 1fr 1fr 1fr auto",
+          gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr 1fr 1fr auto",
           gap: "15px",
           alignItems: "end",
         }}
@@ -104,15 +117,17 @@ export default function FeedbackSearch({
             onChange={(e) => setStatus(e.target.value)}
             style={inputStyle}
           >
-            <option value="">All</option>
-            <option value="NEW">🆕 New</option>
-            <option value="REVIEW">👀 Review</option>
-            <option value="ACTIONED">✅ Actioned</option>
-            <option value="CLOSED">✔ Closed</option>
+            <option value="">All Status</option>
+            <option value="NEW">NEW</option>
+            <option value="REVIEW">REVIEW</option>
+            <option value="IN_PROGRESS">IN_PROGRESS</option>
+            <option value="ACTIONED">ACTIONED</option>
+            <option value="RESOLVED">RESOLVED</option>
           </select>
         </div>
+        {/* Channel */}
+        {/* Channel */}
 
-        {/* Date */}
         <div>
           <label
             style={{
@@ -122,13 +137,96 @@ export default function FeedbackSearch({
               color: "#374151",
             }}
           >
-            Date
+            Channel
+          </label>
+
+          <select
+            value={channel}
+            onChange={(e) => setChannel(e.target.value)}
+            style={inputStyle}
+          >
+            <option value="">All Channels</option>
+            <option value="Website">Website</option>
+            <option value="Email">Email</option>
+            <option value="Mobile">Mobile</option>
+            <option value="Play Store">Play Store</option>
+            <option value="App Store">App Store</option>
+            <option value="LinkedIn">LinkedIn</option>
+          </select>
+        </div>
+
+        {/* Theme */}
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "600",
+              color: "#374151",
+            }}
+          >
+            Theme
+          </label>
+
+          <select
+            value={theme}
+            onChange={(e) => setTheme(e.target.value)}
+            style={inputStyle}
+          >
+            <option value="">All Themes</option>
+            <option value="Authentication">Authentication</option>
+            <option value="Delivery">Delivery</option>
+            <option value="Crash">Crash</option>
+            <option value="Performance">Performance</option>
+            <option value="Support">Support</option>
+            <option value="Registration">Registration</option>
+            <option value="UI">UI</option>
+            <option value="General">General</option>
+            <option value="Onboarding">Onboarding</option>
+          </select>
+        </div>
+
+        {/* From Date */}
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "600",
+              color: "#374151",
+            }}
+          >
+            From
           </label>
 
           <input
             type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            style={inputStyle}
+          />
+        </div>
+
+        {/* To Date */}
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "600",
+              color: "#374151",
+            }}
+          >
+            To
+          </label>
+
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
             style={inputStyle}
           />
         </div>
