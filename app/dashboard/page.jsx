@@ -1,8 +1,45 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import FeedbackVolumeChart from "@/components/dashboard/FeedbackVolumeChart";
+import SentimentPieChart from "@/components/dashboard/SentimentPieChart";
+import TopThemesChart from "@/components/dashboard/TopThemesChart";
+import DashboardStats from "@/components/dashboard/DashboardStats";
 
 export default function DashboardPage() {
+  const [stats, setStats] = useState({});
+
+  const [volumeData, setVolumeData] = useState([]);
+
+  const [sentimentData, setSentimentData] = useState([]);
+
+  const [themeData, setThemeData] = useState([]);
+
+  const loadDashboard = async () => {
+    try {
+      const response = await fetch("/api/dashboard");
+
+      const data = await response.json();
+
+      setStats(data.stats);
+
+      setVolumeData(data.volumeData);
+
+      setSentimentData(data.sentimentData);
+
+      setThemeData(data.themeData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
   return (
     <div
       style={{
@@ -30,23 +67,24 @@ export default function DashboardPage() {
             Dashboard
           </h1>
 
-          {/* Statistics Cards */}
+          {/* Stats Cards */}
+          <DashboardStats stats={stats} />
+
+          {/* Dashboard Charts */}
 
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(4,1fr)",
-              gap: "20px",
+              gridTemplateColumns: "repeat(auto-fit,minmax(400px,1fr))",
+              gap: "25px",
               marginBottom: "35px",
             }}
           >
-            <Card title="Total Feedback" value="120" color="#4F46E5" />
+            <FeedbackVolumeChart data={volumeData} />
 
-            <Card title="Positive" value="75" color="#10B981" />
+            <SentimentPieChart data={sentimentData} />
 
-            <Card title="Negative" value="30" color="#EF4444" />
-
-            <Card title="Pending" value="15" color="#F59E0B" />
+            <TopThemesChart data={themeData} />
           </div>
 
           {/* Recent Feedback */}
@@ -106,37 +144,6 @@ export default function DashboardPage() {
 
         <Footer />
       </div>
-    </div>
-  );
-}
-
-function Card({ title, value, color }) {
-  return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: "18px",
-        padding: "25px",
-        boxShadow: "0 10px 25px rgba(0,0,0,.08)",
-      }}
-    >
-      <p
-        style={{
-          color: "#6B7280",
-          marginBottom: "10px",
-        }}
-      >
-        {title}
-      </p>
-
-      <h2
-        style={{
-          color,
-          fontSize: "34px",
-        }}
-      >
-        {value}
-      </h2>
     </div>
   );
 }
