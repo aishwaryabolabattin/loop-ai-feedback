@@ -18,7 +18,7 @@ export default function FeedbackForm({ form, setForm, handleSubmit }) {
           color: "#111827",
         }}
       >
-        ➕ Add New Feedback
+        🤖 AI Feedback Analyzer
       </h2>
 
       <form onSubmit={handleSubmit}>
@@ -48,82 +48,10 @@ export default function FeedbackForm({ form, setForm, handleSubmit }) {
             />
           </div>
 
-          {/* Sentiment */}
-
-          <div>
-            <label style={label}>Sentiment</label>
-
-            <select
-              value={form.sentiment}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  sentiment: e.target.value,
-                })
-              }
-              style={input}
-            >
-              <option value="">Select Sentiment</option>
-
-              <option value="POSITIVE">😊 Positive</option>
-
-              <option value="NEGATIVE">😞 Negative</option>
-
-              <option value="NEUTRAL">😐 Neutral</option>
-            </select>
-          </div>
-
-          {/* Status */}
-
-          <div>
-            <label style={label}>Status</label>
-
-            <select
-              value={form.status}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  status: e.target.value,
-                })
-              }
-              style={input}
-            >
-              <option value="">Select Status</option>
-
-              <option value="NEW">New</option>
-
-              <option value="REVIEW">Review</option>
-
-              <option value="ACTIONED">Actioned</option>
-
-              <option value="CLOSED">Closed</option>
-            </select>
-          </div>
-
-          {/* Theme */}
-
-          <div>
-            <label style={label}>Theme</label>
-
-            <input
-              type="text"
-              placeholder="Support"
-              value={form.theme}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  theme: e.target.value,
-                })
-              }
-              style={input}
-            />
-          </div>
-
           {/* Channel */}
 
           <div>
             <label style={label}>Channel</label>
-
             <select
               value={form.channel}
               onChange={(e) =>
@@ -142,6 +70,16 @@ export default function FeedbackForm({ form, setForm, handleSubmit }) {
               <option>Phone</option>
               <option>Chat</option>
             </select>
+            <p
+              style={{
+                marginTop: "8px",
+                color: "#6B7280",
+                fontSize: "13px",
+              }}
+            >
+              AI will automatically detect the sentiment, theme, status, summary
+              and confidence score.
+            </p>
           </div>
         </div>
 
@@ -166,7 +104,7 @@ export default function FeedbackForm({ form, setForm, handleSubmit }) {
               boxShadow: "0 10px 20px rgba(79,70,229,.3)",
             }}
           >
-            ➕ Save Feedback
+            🤖 Analyze & Save Feedback
           </button>
         </div>
       </form>

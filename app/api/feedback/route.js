@@ -1,5 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { classifyFeedback } from "@/lib/ai";
+
 // GET Feedback (Pagination + Search)
 
 export async function GET(request) {
@@ -123,6 +125,8 @@ const where = {
 }
 // CREATE Feedback
 
+ // CREATE Feedback
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -130,31 +134,63 @@ export async function POST(request) {
     const workspaceId = 1;
     const userId = 1;
 
+    // AI Classification
+    let ai;
+
+try {
+  ai = await classifyFeedback(body.message);
+} catch (error) {
+  console.error("Claude AI Error:", error);
+
+  ai = {
+    sentiment: "NEUTRAL",
+    status: "NEW",
+    theme: "General",
+    summary: "AI analysis unavailable.",
+    confidence: 0,
+  };
+}
+
+    // Save feedback
     const feedback = await prisma.feedback.create({
       data: {
-        message: body.message,
-        sentiment: body.sentiment,
-        status: body.status,
-        theme: body.theme,
-        channel: body.channel,
-        workspaceId,
-        userId,
-      },
+  message: body.message,
+
+  sentiment: ai.sentiment,
+
+  status: ai.status,
+
+  theme: ai.theme,
+
+  channel: body.channel,
+
+  summary: ai.summary,
+
+  confidence: ai.confidence,
+
+  workspaceId,
+
+  userId,
+},
     });
 
-    return NextResponse.json(feedback);
+    return NextResponse.json({
+  success: true,
+  feedback,
+});
 
   } catch (error) {
+    console.error(error);
 
     return NextResponse.json(
-      {
-        error: error.message,
-      },
-      {
-        status: 500,
-      }
-    );
-
+  {
+    success: false,
+    error: error.message,
+  },
+  {
+    status: 500,
+  }
+);
   }
 }
 
@@ -244,14 +280,14 @@ export async function PUT(request) {
       },
 
       data: {
-
-        message: body.message,
-        sentiment: body.sentiment,
-        status: body.status,
-        theme: body.theme,
-        channel: body.channel,
-
-      },
+  message: body.message,
+  sentiment: body.sentiment,
+  status: body.status,
+  theme: body.theme,
+  channel: body.channel,
+  summary: body.summary,
+  confidence: body.confidence,
+},
 
     });
 

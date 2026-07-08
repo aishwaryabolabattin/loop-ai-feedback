@@ -8,6 +8,7 @@ export default function FeedbackTable({
   onEdit,
   onDelete,
   onView,
+  loadFeedback,
 }) {
   return (
     <div
@@ -84,6 +85,8 @@ export default function FeedbackTable({
               <th style={th}>Channel</th>
               <th style={th}>Sentiment</th>
               <th style={th}>Status</th>
+              <th style={th}>Summary</th>
+              <th style={th}>Confidence</th>
               <th style={th}>Date</th>
               <th style={th}>Actions</th>
             </tr>
@@ -93,7 +96,7 @@ export default function FeedbackTable({
             {feedback.length === 0 ? (
               <tr>
                 <td
-                  colSpan="8"
+                  colSpan="10"
                   style={{
                     textAlign: "center",
                     padding: "60px",
@@ -215,6 +218,18 @@ export default function FeedbackTable({
                         }
                       }}
                     />
+                  </td>
+
+                  {/* Summary */}
+
+                  <td style={td}>{item.summary || "-"}</td>
+
+                  {/* Confidence */}
+
+                  <td style={td}>
+                    {item.confidence !== null && item.confidence !== undefined
+                      ? `${Math.round(item.confidence * 100)}%`
+                      : "-"}
                   </td>
 
                   {/* Date */}

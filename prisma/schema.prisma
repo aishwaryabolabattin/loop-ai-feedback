@@ -43,16 +43,26 @@ model User {
 
 model Feedback {
   id          Int      @id @default(autoincrement())
+
   message     String
+
   sentiment   String
+
   status      String
+
   theme       String
+
   channel     String
+
+  summary     String?
+
+  confidence  Float?
+
   createdAt   DateTime @default(now())
 
   workspaceId Int
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
   userId      Int?
-  user         User?    @relation(fields: [userId], references: [id])
+  user        User? @relation(fields: [userId], references: [id])
 }

@@ -9,7 +9,6 @@ import FeedbackStats from "@/components/FeedbackStats";
 import FeedbackSearch from "@/components/FeedbackSearch";
 import FeedbackForm from "@/components/FeedbackForm";
 import FeedbackTable from "@/components/FeedbackTable";
-import FeedbackBadge from "@/components/FeedbackBadge";
 import Pagination from "@/components/Pagination";
 
 export default function FeedbackPage() {
@@ -99,18 +98,22 @@ export default function FeedbackPage() {
     e.preventDefault();
 
     try {
-      await fetch("/api/feedback", {
+      const response = await fetch("/api/feedback", {
         method: editingId ? "PUT" : "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           ...form,
           id: editingId,
         }),
       });
+      const result = await response.json();
+
+      if (!result.success) {
+        alert(result.error);
+        return;
+      }
       setForm({
         message: "",
         sentiment: "",
@@ -122,7 +125,11 @@ export default function FeedbackPage() {
 
       loadFeedback();
 
-      alert("Feedback Added Successfully");
+      alert(
+        editingId
+          ? "Feedback Updated Successfully"
+          : "Feedback Added Successfully",
+      );
     } catch (error) {
       console.log(error);
 
@@ -297,6 +304,7 @@ export default function FeedbackPage() {
 
           <FeedbackTable
             feedback={feedback}
+            loadFeedback={loadFeedback}
             onView={(item) => {
               alert(
                 `Customer: ${item.user?.name || "Unknown"}\n\n` +
@@ -340,19 +348,16 @@ export default function FeedbackPage() {
                 alert("Feedback deleted successfully.");
               } catch (error) {
                 console.log(error);
-
                 alert("Delete failed.");
               }
             }}
           />
+
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={(page) => {
               setCurrentPage(page);
-
-              // Later we'll call:
-              // /api/feedback?page=page
             }}
           />
         </main>
