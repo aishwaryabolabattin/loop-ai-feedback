@@ -45,6 +45,11 @@ export default function FeedbackPage() {
   const [totalPages, setTotalPages] = useState(1);
 
   const [editingId, setEditingId] = useState(null);
+
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const [loadingAI, setLoadingAI] = useState(false);
+
   // ===========================
   // Load Feedback
   // ===========================
@@ -64,9 +69,8 @@ export default function FeedbackPage() {
       );
       const data = await res.json();
 
-      setFeedback(data.feedback);
-
-      setTotalPages(data.totalPages);
+      setFeedback(data.feedback || []);
+      setTotalPages(data.totalPages || 1);
     } catch (error) {
       console.log(error);
     }
@@ -160,6 +164,99 @@ export default function FeedbackPage() {
   };
 
   // ===========================
+  // Reclassify All Feedback
+  // ===========================
+
+  const reclassifyAll = async () => {
+    const confirmAction = window.confirm("Reclassify all feedback using AI?");
+
+    if (!confirmAction) return;
+
+    setLoadingAI(true);
+
+    try {
+      const response = await fetch("/api/feedback/reclassify", {
+        method: "POST",
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        alert(result.error);
+        return;
+      }
+
+      loadFeedback();
+
+      alert(`${result.updated} feedback reclassified successfully.`);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to reclassify feedback.");
+    } finally {
+      setLoadingAI(false);
+    }
+  };
+
+  const toggleSelection = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === feedback.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(feedback.map((item) => item.id));
+    }
+  };
+
+  const reclassifySelected = async () => {
+    if (selectedIds.length === 0) {
+      alert("Please select at least one feedback.");
+      return;
+    }
+
+    const confirmAction = window.confirm(
+      `Reclassify ${selectedIds.length} selected feedback?`,
+    );
+
+    if (!confirmAction) return;
+
+    setLoadingAI(true);
+
+    try {
+      const response = await fetch("/api/feedback/reclassify-selected", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ids: selectedIds,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        alert(result.error);
+        return;
+      }
+
+      loadFeedback();
+
+      setSelectedIds([]);
+
+      alert(`${result.updated} feedback reclassified.`);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to reclassify selected feedback.");
+    } finally {
+      setLoadingAI(false);
+    }
+  };
+
+  // ===========================
   // Filter Feedback
   // ===========================
 
@@ -193,7 +290,7 @@ export default function FeedbackPage() {
           {/* ============================= */}
 
           <FeedbackHeader
-            total={feedback.length}
+            total={feedback?.length || 0}
             onAddFeedback={() => {
               window.scrollTo({
                 top: 600,
@@ -202,19 +299,64 @@ export default function FeedbackPage() {
             }}
           />
 
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "15px",
+              marginBottom: "20px",
+            }}
+          >
+            <button
+              onClick={reclassifySelected}
+              disabled={loadingAI}
+              style={{
+                background: "#10B981",
+                color: "#fff",
+                border: "none",
+                padding: "12px 20px",
+                borderRadius: "10px",
+                cursor: "pointer",
+                fontWeight: "600",
+              }}
+            >
+              {loadingAI ? "Reclassifying..." : "🤖 Reclassify Selected"}
+            </button>
+
+            <button
+              onClick={reclassifyAll}
+              disabled={loadingAI}
+              style={{
+                background: "#4F46E5",
+                color: "#fff",
+                border: "none",
+                padding: "12px 20px",
+                borderRadius: "10px",
+                cursor: "pointer",
+                fontWeight: "600",
+              }}
+            >
+              {loadingAI ? "Reclassifying..." : "🤖 Reclassify All Feedback"}
+            </button>
+          </div>
+
           {/* ============================= */}
           {/* Statistics Cards */}
           {/* ============================= */}
 
           <FeedbackStats
-            total={feedback.length}
+            total={feedback?.length || 0}
             positive={
-              feedback.filter((item) => item.sentiment === "POSITIVE").length
+              (feedback || []).filter((item) => item.sentiment === "POSITIVE")
+                .length
             }
             negative={
-              feedback.filter((item) => item.sentiment === "NEGATIVE").length
+              (feedback || []).filter((item) => item.sentiment === "NEGATIVE")
+                .length
             }
-            pending={feedback.filter((item) => item.status === "NEW").length}
+            pending={
+              (feedback || []).filter((item) => item.status === "NEW").length
+            }
           />
 
           {/* ============================= */}
@@ -283,7 +425,7 @@ export default function FeedbackPage() {
                 boxShadow: "0 8px 20px rgba(79,70,229,.3)",
               }}
             >
-              {feedback.length} Records Found
+              {feedback?.length || 0} Records Found
             </div>
           </div>
           {/* ============================= */}
@@ -305,6 +447,9 @@ export default function FeedbackPage() {
           <FeedbackTable
             feedback={feedback}
             loadFeedback={loadFeedback}
+            selectedIds={selectedIds}
+            toggleSelection={toggleSelection}
+            toggleSelectAll={toggleSelectAll}
             onView={(item) => {
               alert(
                 `Customer: ${item.user?.name || "Unknown"}\n\n` +

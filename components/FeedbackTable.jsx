@@ -9,6 +9,9 @@ export default function FeedbackTable({
   onDelete,
   onView,
   loadFeedback,
+  selectedIds,
+  toggleSelection,
+  toggleSelectAll,
 }) {
   return (
     <div
@@ -79,6 +82,17 @@ export default function FeedbackTable({
                 background: "#F8FAFC",
               }}
             >
+              <th style={th}>
+                <input
+                  type="checkbox"
+                  checked={
+                    feedback.length > 0 &&
+                    selectedIds.length === feedback.length
+                  }
+                  onChange={toggleSelectAll}
+                />
+              </th>
+
               <th style={th}>Customer</th>
               <th style={th}>Message</th>
               <th style={th}>Theme</th>
@@ -96,7 +110,7 @@ export default function FeedbackTable({
             {feedback.length === 0 ? (
               <tr>
                 <td
-                  colSpan="10"
+                  colSpan="11"
                   style={{
                     textAlign: "center",
                     padding: "60px",
@@ -116,6 +130,13 @@ export default function FeedbackTable({
                     transition: ".3s",
                   }}
                 >
+                  <td style={td}>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(item.id)}
+                      onChange={() => toggleSelection(item.id)}
+                    />
+                  </td>
                   {/* Customer */}
 
                   <td style={td}>
@@ -256,6 +277,36 @@ export default function FeedbackTable({
                       </button>
 
                       <button
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(
+                              `/api/feedback/reclassify/${item.id}`,
+                              {
+                                method: "POST",
+                              },
+                            );
+
+                            const result = await response.json();
+
+                            if (!result.success) {
+                              alert(result.error);
+                              return;
+                            }
+
+                            loadFeedback();
+
+                            alert("Feedback reclassified successfully.");
+                          } catch (error) {
+                            console.error(error);
+                            alert("Failed to reclassify feedback.");
+                          }
+                        }}
+                        style={aiBtn}
+                      >
+                        🤖
+                      </button>
+
+                      <button
                         onClick={() => onDelete(item.id)}
                         style={deleteBtn}
                       >
@@ -306,6 +357,15 @@ const editBtn = {
 
 const deleteBtn = {
   background: "#FEE2E2",
+  border: "none",
+  width: "38px",
+  height: "38px",
+  borderRadius: "10px",
+  cursor: "pointer",
+};
+
+const aiBtn = {
+  background: "#E0E7FF",
   border: "none",
   width: "38px",
   height: "38px",
