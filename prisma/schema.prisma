@@ -1,68 +1,50 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model Workspace {
+  id        Int        @id @default(autoincrement())
+  name      String
+  createdAt DateTime   @default(now())
+  feedbacks Feedback[]
+  users     User[]
+}
+
+model User {
+  id          Int        @id @default(autoincrement())
+  name        String
+  email       String     @unique
+  createdAt   DateTime   @default(now())
+  password    String
+  workspaceId Int
+  role        Role       @default(VIEWER)
+  feedbacks   Feedback[]
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id])
+}
+
+model Feedback {
+  id          Int       @id @default(autoincrement())
+  message     String
+  sentiment   String
+  status      String
+  theme       String
+  channel     String
+  createdAt   DateTime  @default(now())
+  userId      Int?
+  workspaceId Int
+  confidence  Float?
+  summary     String?
+  user        User?     @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
 }
 
 enum Role {
   ADMIN
   ANALYST
   VIEWER
-}
-
-model Workspace {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-
-  users     User[]
-  feedbacks Feedback[]
-}
-
-model User {
-  id          Int      @id @default(autoincrement())
-  name        String
-  email       String   @unique
-  password    String
-  role        Role     @default(VIEWER)
-  createdAt   DateTime @default(now())
-
-  workspaceId Int
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-
-  feedbacks   Feedback[]
-}
-
-model Feedback {
-  id          Int      @id @default(autoincrement())
-
-  message     String
-
-  sentiment   String
-
-  status      String
-
-  theme       String
-
-  channel     String
-
-  summary     String?
-
-  confidence  Float?
-
-  createdAt   DateTime @default(now())
-
-  workspaceId Int
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-
-  userId      Int?
-  user        User? @relation(fields: [userId], references: [id])
 }
