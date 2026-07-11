@@ -1,5 +1,7 @@
 "use client";
-
+import Sidebar from "@/components/Sidebar";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { useEffect, useState } from "react";
 import ThemeCard from "@/components/ThemeCard";
 
@@ -133,411 +135,437 @@ export default function ThemesPage() {
   });
 
   return (
-    <main
+    <div
       style={{
+        display: "flex",
         minHeight: "100vh",
-        background: "#F3F4F6",
-        padding: "35px",
       }}
     >
-      {/* Page heading */}
+      {/* Dashboard Sidebar */}
+
+      <Sidebar />
+
+      {/* Right-side dashboard area */}
 
       <div
         style={{
-          marginBottom: "30px",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 0,
         }}
       >
-        <h1
+        <Header />
+
+        <main
           style={{
-            margin: 0,
-            color: "#111827",
-            fontSize: "34px",
+            flex: 1,
+            background: "#F3F4F6",
+            padding: "35px",
           }}
         >
-          🎯 Feedback Themes
-        </h1>
+          {/* Page heading */}
 
-        <p
-          style={{
-            color: "#6B7280",
-            marginTop: "10px",
-          }}
-        >
-          View grouped customer feedback and explore feedback belonging to each
-          theme.
-        </p>
-      </div>
-
-      {/* Total feedback */}
-
-      <div
-        style={{
-          background: "#ffffff",
-          padding: "20px",
-          borderRadius: "16px",
-          marginBottom: "25px",
-          boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
-        }}
-      >
-        <strong
-          style={{
-            color: "#4F46E5",
-            fontSize: "18px",
-          }}
-        >
-          Total Feedback: {totalFeedback}
-        </strong>
-      </div>
-
-      {/* Error */}
-
-      {error && (
-        <div
-          style={{
-            background: "#FEE2E2",
-            color: "#B91C1C",
-            padding: "15px",
-            borderRadius: "10px",
-            marginBottom: "20px",
-          }}
-        >
-          {error}
-        </div>
-      )}
-
-      {/* Loading */}
-
-      {loading ? (
-        <p
-          style={{
-            color: "#6B7280",
-          }}
-        >
-          Loading themes...
-        </p>
-      ) : themes.length === 0 ? (
-        <div
-          style={{
-            background: "#ffffff",
-            padding: "50px",
-            borderRadius: "18px",
-            textAlign: "center",
-            color: "#6B7280",
-          }}
-        >
-          📭 No themes are available.
-        </div>
-      ) : (
-        // Theme cards
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-            gap: "20px",
-          }}
-        >
-          {themes.map((item) => (
-            <ThemeCard
-              key={item.name}
-              theme={item.name}
-              count={item.count}
-              percentage={item.percentage}
-              onView={() => {
-                loadThemeFeedback(item.name);
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Selected theme feedback */}
-
-      {selectedTheme && (
-        <div
-          style={{
-            marginTop: "40px",
-            background: "#ffffff",
-            padding: "25px",
-            borderRadius: "20px",
-            boxShadow: "0 12px 35px rgba(0,0,0,0.08)",
-          }}
-        >
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "20px",
+              marginBottom: "30px",
             }}
           >
-            <div>
-              <h2
-                style={{
-                  margin: 0,
-                  color: "#111827",
-                }}
-              >
-                📋 {selectedTheme} Feedback
-              </h2>
-
-              <p
-                style={{
-                  color: "#6B7280",
-                  marginBottom: 0,
-                }}
-              >
-                Feedback records belonging to the {selectedTheme} theme.
-              </p>
-            </div>
-
-            <button
-              onClick={() => {
-                setSelectedTheme("");
-                setThemeFeedback([]);
+            <h1
+              style={{
+                margin: 0,
+                color: "#111827",
+                fontSize: "34px",
               }}
+            >
+              🎯 Feedback Themes
+            </h1>
+
+            <p
+              style={{
+                color: "#6B7280",
+                marginTop: "10px",
+              }}
+            >
+              View grouped customer feedback and explore feedback belonging to
+              each theme.
+            </p>
+          </div>
+
+          {/* Total feedback */}
+
+          <div
+            style={{
+              background: "#ffffff",
+              padding: "20px",
+              borderRadius: "16px",
+              marginBottom: "25px",
+              boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
+            }}
+          >
+            <strong
+              style={{
+                color: "#4F46E5",
+                fontSize: "18px",
+              }}
+            >
+              Total Feedback: {totalFeedback}
+            </strong>
+          </div>
+
+          {/* Error */}
+
+          {error && (
+            <div
               style={{
                 background: "#FEE2E2",
                 color: "#B91C1C",
-                border: "none",
-                padding: "10px 16px",
+                padding: "15px",
                 borderRadius: "10px",
-                cursor: "pointer",
-                fontWeight: "600",
+                marginBottom: "20px",
               }}
             >
-              ✕ Close
-            </button>
-          </div>
+              {error}
+            </div>
+          )}
 
-          {/* Search and filter section */}
+          {/* Loading */}
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
-              gap: "15px",
-              background: "#F8FAFC",
-              padding: "20px",
-              borderRadius: "14px",
-              marginBottom: "20px",
-            }}
-          >
-            {/* Search feedback */}
-
-            <input
-              type="text"
-              placeholder="🔍 Search message or summary..."
-              value={feedbackSearch}
-              onChange={(event) => {
-                setFeedbackSearch(event.target.value);
-              }}
-              style={filterInput}
-            />
-
-            {/* Sentiment filter */}
-
-            <select
-              value={sentimentFilter}
-              onChange={(event) => {
-                setSentimentFilter(event.target.value);
-              }}
-              style={filterInput}
-            >
-              <option value="">All Sentiments</option>
-
-              <option value="POSITIVE">😊 Positive</option>
-
-              <option value="NEGATIVE">😞 Negative</option>
-
-              <option value="NEUTRAL">😐 Neutral</option>
-            </select>
-
-            {/* Status filter */}
-
-            <select
-              value={statusFilter}
-              onChange={(event) => {
-                setStatusFilter(event.target.value);
-              }}
-              style={filterInput}
-            >
-              <option value="">All Statuses</option>
-
-              <option value="NEW">New</option>
-
-              <option value="REVIEW">Review</option>
-
-              <option value="ACTIONED">Actioned</option>
-
-              <option value="CLOSED">Closed</option>
-            </select>
-
-            {/* Reset filters */}
-
-            <button
-              type="button"
-              onClick={() => {
-                setFeedbackSearch("");
-                setSentimentFilter("");
-                setStatusFilter("");
-              }}
-              style={resetButton}
-            >
-              ↻ Reset Filters
-            </button>
-          </div>
-
-          {/* Filtered feedback count */}
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "20px",
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                color: "#6B7280",
-              }}
-            >
-              Showing{" "}
-              <strong
-                style={{
-                  color: "#4F46E5",
-                }}
-              >
-                {filteredThemeFeedback.length}
-              </strong>{" "}
-              of <strong>{themeFeedback.length}</strong> feedback records
-            </p>
-          </div>
-
-          {/* Selected feedback loading */}
-
-          {feedbackLoading ? (
+          {loading ? (
             <p
               style={{
                 color: "#6B7280",
               }}
             >
-              Loading feedback...
+              Loading themes...
             </p>
-          ) : filteredThemeFeedback.length === 0 ? (
+          ) : themes.length === 0 ? (
             <div
               style={{
-                background: "#F9FAFB",
-                padding: "35px",
-                borderRadius: "12px",
+                background: "#ffffff",
+                padding: "50px",
+                borderRadius: "18px",
                 textAlign: "center",
                 color: "#6B7280",
               }}
             >
-              <div
-                style={{
-                  fontSize: "35px",
-                  marginBottom: "10px",
-                }}
-              >
-                📭
-              </div>
-
-              <strong>No matching feedback found</strong>
-
-              <p
-                style={{
-                  marginBottom: 0,
-                }}
-              >
-                Change the filters or click Reset Filters.
-              </p>
+              📭 No themes are available.
             </div>
           ) : (
+            // Theme cards
+
             <div
               style={{
-                overflowX: "auto",
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                gap: "20px",
               }}
             >
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                }}
-              >
-                <thead>
-                  <tr
-                    style={{
-                      background: "#F8FAFC",
-                    }}
-                  >
-                    <th style={tableHeading}>Message</th>
-
-                    <th style={tableHeading}>Sentiment</th>
-
-                    <th style={tableHeading}>Status</th>
-
-                    <th style={tableHeading}>Channel</th>
-
-                    <th style={tableHeading}>Summary</th>
-
-                    <th style={tableHeading}>Confidence</th>
-
-                    <th style={tableHeading}>Date</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {filteredThemeFeedback.map((item) => (
-                    <tr
-                      key={item.id}
-                      style={{
-                        borderBottom: "1px solid #E5E7EB",
-                      }}
-                    >
-                      <td style={tableData}>{item.message}</td>
-
-                      <td style={tableData}>
-                        <span style={getSentimentStyle(item.sentiment)}>
-                          {item.sentiment === "POSITIVE"
-                            ? "😊 Positive"
-                            : item.sentiment === "NEGATIVE"
-                              ? "😞 Negative"
-                              : "😐 Neutral"}
-                        </span>
-                      </td>
-
-                      <td style={tableData}>
-                        <span style={getStatusStyle(item.status)}>
-                          {item.status}
-                        </span>
-                      </td>
-
-                      <td style={tableData}>{item.channel}</td>
-
-                      <td style={tableData}>{item.summary || "-"}</td>
-
-                      <td style={tableData}>
-                        {item.confidence !== null &&
-                        item.confidence !== undefined
-                          ? `${Math.round(item.confidence * 100)}%`
-                          : "-"}
-                      </td>
-
-                      <td style={tableData}>
-                        {new Date(item.createdAt).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              {themes.map((item) => (
+                <ThemeCard
+                  key={item.name}
+                  theme={item.name}
+                  count={item.count}
+                  percentage={item.percentage}
+                  onView={() => {
+                    loadThemeFeedback(item.name);
+                  }}
+                />
+              ))}
             </div>
           )}
-        </div>
-      )}
-    </main>
+
+          {/* Selected theme feedback */}
+
+          {selectedTheme && (
+            <div
+              style={{
+                marginTop: "40px",
+                background: "#ffffff",
+                padding: "25px",
+                borderRadius: "20px",
+                boxShadow: "0 12px 35px rgba(0,0,0,0.08)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "20px",
+                }}
+              >
+                <div>
+                  <h2
+                    style={{
+                      margin: 0,
+                      color: "#111827",
+                    }}
+                  >
+                    📋 {selectedTheme} Feedback
+                  </h2>
+
+                  <p
+                    style={{
+                      color: "#6B7280",
+                      marginBottom: 0,
+                    }}
+                  >
+                    Feedback records belonging to the {selectedTheme} theme.
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setSelectedTheme("");
+                    setThemeFeedback([]);
+                  }}
+                  style={{
+                    background: "#FEE2E2",
+                    color: "#B91C1C",
+                    border: "none",
+                    padding: "10px 16px",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                  }}
+                >
+                  ✕ Close
+                </button>
+              </div>
+
+              {/* Search and filter section */}
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+                  gap: "15px",
+                  background: "#F8FAFC",
+                  padding: "20px",
+                  borderRadius: "14px",
+                  marginBottom: "20px",
+                }}
+              >
+                {/* Search feedback */}
+
+                <input
+                  type="text"
+                  placeholder="🔍 Search message or summary..."
+                  value={feedbackSearch}
+                  onChange={(event) => {
+                    setFeedbackSearch(event.target.value);
+                  }}
+                  style={filterInput}
+                />
+
+                {/* Sentiment filter */}
+
+                <select
+                  value={sentimentFilter}
+                  onChange={(event) => {
+                    setSentimentFilter(event.target.value);
+                  }}
+                  style={filterInput}
+                >
+                  <option value="">All Sentiments</option>
+
+                  <option value="POSITIVE">😊 Positive</option>
+
+                  <option value="NEGATIVE">😞 Negative</option>
+
+                  <option value="NEUTRAL">😐 Neutral</option>
+                </select>
+
+                {/* Status filter */}
+
+                <select
+                  value={statusFilter}
+                  onChange={(event) => {
+                    setStatusFilter(event.target.value);
+                  }}
+                  style={filterInput}
+                >
+                  <option value="">All Statuses</option>
+
+                  <option value="NEW">New</option>
+
+                  <option value="REVIEW">Review</option>
+
+                  <option value="ACTIONED">Actioned</option>
+
+                  <option value="CLOSED">Closed</option>
+                </select>
+
+                {/* Reset filters */}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFeedbackSearch("");
+                    setSentimentFilter("");
+                    setStatusFilter("");
+                  }}
+                  style={resetButton}
+                >
+                  ↻ Reset Filters
+                </button>
+              </div>
+
+              {/* Filtered feedback count */}
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "20px",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    color: "#6B7280",
+                  }}
+                >
+                  Showing{" "}
+                  <strong
+                    style={{
+                      color: "#4F46E5",
+                    }}
+                  >
+                    {filteredThemeFeedback.length}
+                  </strong>{" "}
+                  of <strong>{themeFeedback.length}</strong> feedback records
+                </p>
+              </div>
+
+              {/* Selected feedback loading */}
+
+              {feedbackLoading ? (
+                <p
+                  style={{
+                    color: "#6B7280",
+                  }}
+                >
+                  Loading feedback...
+                </p>
+              ) : filteredThemeFeedback.length === 0 ? (
+                <div
+                  style={{
+                    background: "#F9FAFB",
+                    padding: "35px",
+                    borderRadius: "12px",
+                    textAlign: "center",
+                    color: "#6B7280",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "35px",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    📭
+                  </div>
+
+                  <strong>No matching feedback found</strong>
+
+                  <p
+                    style={{
+                      marginBottom: 0,
+                    }}
+                  >
+                    Change the filters or click Reset Filters.
+                  </p>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    overflowX: "auto",
+                  }}
+                >
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "collapse",
+                    }}
+                  >
+                    <thead>
+                      <tr
+                        style={{
+                          background: "#F8FAFC",
+                        }}
+                      >
+                        <th style={tableHeading}>Message</th>
+
+                        <th style={tableHeading}>Sentiment</th>
+
+                        <th style={tableHeading}>Status</th>
+
+                        <th style={tableHeading}>Channel</th>
+
+                        <th style={tableHeading}>Summary</th>
+
+                        <th style={tableHeading}>Confidence</th>
+
+                        <th style={tableHeading}>Date</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {filteredThemeFeedback.map((item) => (
+                        <tr
+                          key={item.id}
+                          style={{
+                            borderBottom: "1px solid #E5E7EB",
+                          }}
+                        >
+                          <td style={tableData}>{item.message}</td>
+
+                          <td style={tableData}>
+                            <span style={getSentimentStyle(item.sentiment)}>
+                              {item.sentiment === "POSITIVE"
+                                ? "😊 Positive"
+                                : item.sentiment === "NEGATIVE"
+                                  ? "😞 Negative"
+                                  : "😐 Neutral"}
+                            </span>
+                          </td>
+
+                          <td style={tableData}>
+                            <span style={getStatusStyle(item.status)}>
+                              {item.status}
+                            </span>
+                          </td>
+
+                          <td style={tableData}>{item.channel}</td>
+
+                          <td style={tableData}>{item.summary || "-"}</td>
+
+                          <td style={tableData}>
+                            {item.confidence !== null &&
+                            item.confidence !== undefined
+                              ? `${Math.round(item.confidence * 100)}%`
+                              : "-"}
+                          </td>
+
+                          <td style={tableData}>
+                            {new Date(item.createdAt).toLocaleDateString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+        </main>
+
+        <Footer />
+      </div>
+    </div>
   );
 }
 // Table heading style

@@ -10,43 +10,52 @@ export default function Sidebar() {
     {
       title: "Dashboard",
       icon: "📊",
-      link: "/dashboard",
+      href: "/dashboard",
     },
     {
       title: "Feedback",
       icon: "💬",
-      link: "/feedback",
+      href: "/feedback",
     },
     {
       title: "CSV Upload",
       icon: "📂",
-      link: "/upload",
+      href: "/upload",
     },
     {
       title: "Simulator",
       icon: "🚀",
-      link: "/simulator",
+      href: "/simulator",
     },
     {
       title: "Analytics",
+      icon: "📊",
+      href: "/analytics",
+    },
+    {
+      title: "Themes",
+      icon: "🏷️",
+      href: "/themes",
+    },
+    {
+      title: "Trends",
       icon: "📈",
-      link: "/analytics",
+      href: "/trends",
     },
     {
       title: "Members",
       icon: "👥",
-      link: "/members",
+      href: "/members",
     },
-
     {
       title: "Reports",
       icon: "📄",
-      link: "/reports",
+      href: "/reports",
     },
     {
       title: "Settings",
       icon: "⚙️",
-      link: "/settings",
+      href: "/settings",
     },
   ];
 
@@ -62,10 +71,13 @@ export default function Sidebar() {
         justifyContent: "space-between",
         position: "sticky",
         top: 0,
+        overflowY: "auto",
+        flexShrink: 0,
       }}
     >
-      {/* Logo */}
       <div>
+        {/* Logo */}
+
         <div
           style={{
             padding: "28px",
@@ -94,51 +106,56 @@ export default function Sidebar() {
         </div>
 
         {/* Navigation */}
+
         <div
           style={{
             padding: "20px",
           }}
         >
-          {menuItems.map((item) => (
-            <Link
-              key={item.link}
-              href={item.link}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "14px",
-                textDecoration: "none",
-                color: pathname === item.link ? "#ffffff" : "#D1D5DB",
-                background: pathname === item.link ? "#4F46E5" : "transparent",
-                padding: "14px 18px",
-                borderRadius: "12px",
-                marginBottom: "12px",
-                fontWeight: "600",
-                transition: "0.3s",
-              }}
-            >
-              <span
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
                 style={{
-                  fontSize: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  textDecoration: "none",
+                  color: isActive ? "#FFFFFF" : "#D1D5DB",
+                  background: isActive ? "#4F46E5" : "transparent",
+                  padding: "14px 18px",
+                  borderRadius: "12px",
+                  marginBottom: "12px",
+                  fontWeight: "600",
+                  transition: "0.3s",
                 }}
               >
-                {item.icon}
-              </span>
+                <span
+                  style={{
+                    fontSize: "20px",
+                  }}
+                >
+                  {item.icon}
+                </span>
 
-              {item.title}
-            </Link>
-          ))}
+                <span>{item.title}</span>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
       {/* Bottom Section */}
+
       <div
         style={{
           padding: "20px",
           borderTop: "1px solid rgba(255,255,255,.08)",
         }}
       >
-        {/* User */}
         <div
           style={{
             display: "flex",
@@ -182,14 +199,13 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Logout Button */}
         <button
           style={{
             width: "100%",
             padding: "14px",
             borderRadius: "12px",
             background: "#EF4444",
-            color: "#fff",
+            color: "#FFFFFF",
             border: "none",
             cursor: "pointer",
             fontWeight: "700",
