@@ -1,6 +1,11 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { classifyFeedback } from "@/lib/ai";
+import {
+  createEmbedding,
+  createFeedbackEmbeddingText,
+  EMBEDDING_MODEL,
+} from "@/lib/embeddings";
 
 // GET Feedback (Pagination + Search)
 
@@ -127,6 +132,8 @@ const where = {
 
  // CREATE Feedback
 
+// CREATE Feedback
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -134,66 +141,120 @@ export async function POST(request) {
     const workspaceId = 1;
     const userId = 1;
 
-    // AI Classification
+    // Validate the feedback message
+    if (!body.message || !body.message.trim()) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Feedback message is required.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    // ==================================
+    // Day 12: AI Classification
+    // ==================================
+
     let ai;
 
-try {
-  ai = await classifyFeedback(body.message);
-} catch (error) {
-  console.error("Claude AI Error:", error);
+    try {
+      ai = await classifyFeedback(body.message);
+    } catch (error) {
+      console.error("Claude AI Error:", error);
 
-  ai = {
-    sentiment: "NEUTRAL",
-    status: "NEW",
-    theme: "General",
-    summary: "AI analysis unavailable.",
-    confidence: 0,
-  };
-}
+      ai = {
+        sentiment: "NEUTRAL",
+        status: "NEW",
+        theme: "General",
+        summary: "AI analysis unavailable.",
+        confidence: 0,
+      };
+    }
 
-    // Save feedback
+    // ==================================
+    // Day 15: Generate Embedding
+    // ==================================
+
+    let embedding = null;
+
+    try {
+      // Combine the feedback information into one text value.
+      const embeddingText = createFeedbackEmbeddingText({
+        message: body.message,
+        sentiment: ai.sentiment,
+        theme: ai.theme,
+        summary: ai.summary,
+        channel: body.channel,
+      });
+
+      // Generate the OpenAI embedding.
+      embedding = await createEmbedding(embeddingText);
+    } catch (embeddingError) {
+      console.error(
+        "OpenAI embedding generation failed:",
+        embeddingError,
+      );
+    }
+
+    // ==================================
+    // Save Feedback
+    // ==================================
+
     const feedback = await prisma.feedback.create({
       data: {
-  message: body.message,
+        message: body.message,
 
-  sentiment: ai.sentiment,
+        sentiment: ai.sentiment,
 
-  status: ai.status,
+        status: ai.status,
 
-  theme: ai.theme,
+        theme: ai.theme,
 
-  channel: body.channel,
+        channel: body.channel,
 
-  summary: ai.summary,
+        summary: ai.summary,
 
-  confidence: ai.confidence,
+        confidence: ai.confidence,
 
-  workspaceId,
+        workspaceId,
 
-  userId,
-},
+        userId,
+
+        // Day 15: Save embedding results
+        embedding,
+
+        embeddedAt: embedding ? new Date() : null,
+
+        embeddingModel: embedding
+          ? EMBEDDING_MODEL
+          : null,
+      },
     });
 
     return NextResponse.json({
-  success: true,
-  feedback,
-});
-
+      success: true,
+      feedback,
+    });
   } catch (error) {
-    console.error(error);
+    console.error(
+      "Create feedback error:",
+      error,
+    );
 
     return NextResponse.json(
-  {
-    success: false,
-    error: error.message,
-  },
-  {
-    status: 500,
-  }
-);
+      {
+        success: false,
+        error: error.message,
+      },
+      {
+        status: 500,
+      },
+    );
   }
 }
-
 
 // UPDATE STATUS
 

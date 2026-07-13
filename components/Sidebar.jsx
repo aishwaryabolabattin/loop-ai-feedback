@@ -43,6 +43,11 @@ export default function Sidebar() {
       href: "/trends",
     },
     {
+      title: "Ask LOOP",
+      icon: "🤖",
+      href: "/ask-loop",
+    },
+    {
       title: "Members",
       icon: "👥",
       href: "/members",

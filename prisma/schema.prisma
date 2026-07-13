@@ -28,19 +28,24 @@ model User {
 }
 
 model Feedback {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   message     String
   sentiment   String
   status      String
   theme       String
   channel     String
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
   userId      Int?
   workspaceId Int
   confidence  Float?
   summary     String?
-  user        User?     @relation(fields: [userId], references: [id])
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  embedding      Json?
+  embeddedAt     DateTime?
+  embeddingModel String?
+
+  user      User?     @relation(fields: [userId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
 }
 
 enum Role {
