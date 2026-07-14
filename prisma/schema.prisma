@@ -8,11 +8,12 @@ datasource db {
 }
 
 model Workspace {
-  id        Int        @id @default(autoincrement())
-  name      String
-  createdAt DateTime   @default(now())
-  feedbacks Feedback[]
-  users     User[]
+  id         Int         @id @default(autoincrement())
+  name       String
+  createdAt  DateTime    @default(now())
+  feedbacks  Feedback[]
+  users      User[]
+  vocReports VocReport[]
 }
 
 model User {
@@ -28,24 +29,43 @@ model User {
 }
 
 model Feedback {
-  id          Int      @id @default(autoincrement())
-  message     String
-  sentiment   String
-  status      String
-  theme       String
-  channel     String
-  createdAt   DateTime @default(now())
-  userId      Int?
-  workspaceId Int
-  confidence  Float?
-  summary     String?
-
-  embedding      Json?
+  id             Int       @id @default(autoincrement())
+  message        String
+  sentiment      String
+  status         String
+  theme          String
+  channel        String
+  createdAt      DateTime  @default(now())
+  userId         Int?
+  workspaceId    Int
+  confidence     Float?
+  summary        String?
   embeddedAt     DateTime?
+  embedding      Json?
   embeddingModel String?
+  user           User?     @relation(fields: [userId], references: [id])
+  workspace      Workspace @relation(fields: [workspaceId], references: [id])
+}
 
-  user      User?     @relation(fields: [userId], references: [id])
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
+model VocReport {
+  id              Int       @id @default(autoincrement())
+  title           String
+  period          String
+  startDate       DateTime
+  endDate         DateTime
+  totalFeedback   Int
+  positiveCount   Int       @default(0)
+  neutralCount    Int       @default(0)
+  negativeCount   Int       @default(0)
+  statistics      Json
+  narrative       String
+  keyInsights     Json
+  recommendations Json
+  status          String    @default("COMPLETED")
+  workspaceId     Int
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
