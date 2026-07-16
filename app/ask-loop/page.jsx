@@ -5,7 +5,7 @@ import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
+import { showSuccess, showError, showLoading, dismissToast } from "@/lib/toast";
 export default function AskLoopPage() {
   // User's current question
   const [question, setQuestion] = useState("");
@@ -39,6 +39,7 @@ export default function AskLoopPage() {
       setAnswer("");
       setCitations([]);
 
+      const toastId = showLoading("Searching feedback...");
       const response = await fetch("/api/ask-loop", {
         method: "POST",
 
@@ -60,11 +61,16 @@ export default function AskLoopPage() {
       }
 
       setAnswer(result.answer || "");
+      dismissToast(toastId);
+
+      showSuccess("Answer generated successfully.");
 
       setCitations(Array.isArray(result.citations) ? result.citations : []);
     } catch (requestError) {
       console.error("Ask LOOP request error:", requestError);
+      dismissToast(toastId);
 
+      showError(requestError.message || "Something went wrong.");
       setError(
         requestError.message ||
           "Something went wrong while generating the answer.",
@@ -196,6 +202,8 @@ export default function AskLoopPage() {
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "20px",
                   alignItems: "center",
                   gap: "20px",
                   marginTop: "10px",
@@ -408,7 +416,7 @@ export default function AskLoopPage() {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                  gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))",
                   gap: "20px",
                 }}
               >

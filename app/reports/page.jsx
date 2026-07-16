@@ -7,7 +7,7 @@ import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import VocReportCard from "@/components/VocReportCard";
-
+import { showSuccess, showError, showLoading, dismissToast } from "@/lib/toast";
 export default function ReportsPage() {
   // Selected report period
   const [selectedDays, setSelectedDays] = useState(30);
@@ -72,7 +72,7 @@ export default function ReportsPage() {
       setError("");
 
       setSuccessMessage("");
-
+      const toastId = showLoading("Generating report...");
       const response = await fetch("/api/reports/generate", {
         method: "POST",
 
@@ -93,16 +93,18 @@ export default function ReportsPage() {
         throw new Error(result.error || "The report could not be generated.");
       }
 
-      setSuccessMessage(
-        "Voice-of-Customer report generated and saved successfully.",
-      );
+      dismissToast(toastId);
+
+      showSuccess("Report generated successfully.");
 
       // Reload saved reports.
       await loadReports();
     } catch (requestError) {
       console.error("Generate report error:", requestError);
 
-      setError(requestError.message || "The report could not be generated.");
+      dismissToast(toastId);
+
+      showError(requestError.message || "The report could not be generated.");
     } finally {
       setGeneratingReport(false);
     }

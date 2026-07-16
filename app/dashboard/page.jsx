@@ -10,6 +10,8 @@ import FeedbackVolumeChart from "@/components/dashboard/FeedbackVolumeChart";
 import SentimentPieChart from "@/components/dashboard/SentimentPieChart";
 import TopThemesChart from "@/components/dashboard/TopThemesChart";
 import DashboardStats from "@/components/dashboard/DashboardStats";
+import EmptyState from "@/components/EmptyState";
+import Skeleton from "@/components/Skeleton";
 
 export default function DashboardPage() {
   // Real dashboard statistics
@@ -204,6 +206,35 @@ export default function DashboardPage() {
               ⚠️ {error}
             </div>
           )}
+          {loading ? (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+                gap: "20px",
+                marginBottom: "30px",
+              }}
+            >
+              {[1, 2, 3, 4].map((item) => (
+                <div
+                  key={item}
+                  style={{
+                    padding: "25px",
+                    background: "#fff",
+                    borderRadius: "15px",
+                  }}
+                >
+                  <Skeleton width="60%" height="20px" />
+
+                  <div style={{ height: "15px" }} />
+
+                  <Skeleton width="40%" height="40px" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <DashboardStats stats={stats} />
+          )}
 
           {/* Real statistics cards */}
 
@@ -219,11 +250,42 @@ export default function DashboardPage() {
               marginBottom: "35px",
             }}
           >
-            <FeedbackVolumeChart data={volumeData} />
+            {loading ? (
+              <div
+                style={{
+                  isplay: "grid",
+                  gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))",
+                  gap: "25px",
+                  marginBottom: "30px",
+                }}
+              >
+                {[1, 2, 3].map((item) => (
+                  <div
+                    key={item}
+                    style={{
+                      height: "320px",
+                      background: "#fff",
+                      borderRadius: "18px",
+                      padding: "20px",
+                    }}
+                  >
+                    <Skeleton height="25px" width="40%" />
 
-            <SentimentPieChart data={sentimentData} />
+                    <div style={{ height: "25px" }} />
 
-            <TopThemesChart data={themeData} />
+                    <Skeleton height="220px" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <>
+                <FeedbackVolumeChart data={volumeData} />
+
+                <SentimentPieChart data={sentimentData} />
+
+                <TopThemesChart data={themeData} />
+              </>
+            )}
           </div>
 
           {/* Real recent feedback */}
@@ -284,29 +346,37 @@ export default function DashboardPage() {
             {/* Loading message */}
 
             {loading ? (
-              <div
-                style={{
-                  padding: "35px",
-                  textAlign: "center",
-                  color: "#6B7280",
-                }}
-              >
-                ⏳ Loading recent feedback...
+              <div>
+                {[1, 2, 3, 4, 5].map((item) => (
+                  <div
+                    key={item}
+                    style={{
+                      display: "flex",
+                      gap: "15px",
+                      marginBottom: "18px",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Skeleton width="80px" height="18px" />
+
+                    <Skeleton width="320px" height="18px" />
+
+                    <Skeleton width="90px" height="18px" />
+
+                    <Skeleton width="90px" height="18px" />
+
+                    <Skeleton width="120px" height="18px" />
+                  </div>
+                ))}
               </div>
             ) : recentFeedback.length === 0 ? (
-              /* Empty database message */
-
-              <div
-                style={{
-                  padding: "35px",
-                  textAlign: "center",
-                  borderRadius: "12px",
-                  background: "#F9FAFB",
-                  color: "#6B7280",
-                }}
-              >
-                No feedback records are available.
-              </div>
+              <EmptyState
+                icon="📭"
+                title="No Feedback Yet"
+                description="Customer feedback will appear here after users submit feedback."
+                buttonText="➕ Add Feedback"
+                buttonLink="/feedback"
+              />
             ) : (
               /* Real feedback table */
 
@@ -567,4 +637,3 @@ const tableCell = {
   verticalAlign: "top",
   fontSize: "14px",
 };
-

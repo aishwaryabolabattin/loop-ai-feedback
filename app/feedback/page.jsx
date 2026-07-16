@@ -10,6 +10,8 @@ import FeedbackSearch from "@/components/FeedbackSearch";
 import FeedbackForm from "@/components/FeedbackForm";
 import FeedbackTable from "@/components/FeedbackTable";
 import Pagination from "@/components/Pagination";
+import Skeleton from "@/components/Skeleton";
+import { showSuccess, showError, showLoading, dismissToast } from "@/lib/toast";
 
 export default function FeedbackPage() {
   // ===========================
@@ -50,29 +52,37 @@ export default function FeedbackPage() {
 
   const [loadingAI, setLoadingAI] = useState(false);
 
+  const [loading, setLoading] = useState(true);
+
   // ===========================
   // Load Feedback
   // ===========================
 
   const loadFeedback = async () => {
     try {
+      setLoading(true);
+
       const res = await fetch(
         `/api/feedback?page=${currentPage}
-  &limit=10
-  &search=${search}
-  &sentiment=${sentiment}
-  &status=${status}
-  &channel=${channel}
-  &theme=${theme}
-  &startDate=${startDate}
-  &endDate=${endDate}`,
+&limit=10
+&search=${search}
+&sentiment=${sentiment}
+&status=${status}
+&channel=${channel}
+&theme=${theme}
+&startDate=${startDate}
+&endDate=${endDate}`,
       );
+
       const data = await res.json();
 
       setFeedback(data.feedback || []);
+
       setTotalPages(data.totalPages || 1);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -115,7 +125,7 @@ export default function FeedbackPage() {
       const result = await response.json();
 
       if (!result.success) {
-        alert(result.error);
+        showError(result.message || result.error);
         return;
       }
       setForm({
@@ -129,15 +139,15 @@ export default function FeedbackPage() {
 
       loadFeedback();
 
-      alert(
+      showSuccess(
         editingId
-          ? "Feedback Updated Successfully"
-          : "Feedback Added Successfully",
+          ? "Feedback updated successfully."
+          : "Feedback added successfully.",
       );
     } catch (error) {
       console.log(error);
 
-      alert("Something went wrong.");
+      showError("Something went wrong.");
     }
   };
 
@@ -182,16 +192,16 @@ export default function FeedbackPage() {
       const result = await response.json();
 
       if (!result.success) {
-        alert(result.error);
+        showError(result.message || result.error);
         return;
       }
 
       loadFeedback();
 
-      alert(`${result.updated} feedback reclassified successfully.`);
+      showSuccess(`${result.updated} feedback reclassified successfully.`);
     } catch (error) {
       console.error(error);
-      alert("Failed to reclassify feedback.");
+      showError("Failed to reclassify feedback.");
     } finally {
       setLoadingAI(false);
     }
@@ -213,7 +223,7 @@ export default function FeedbackPage() {
 
   const reclassifySelected = async () => {
     if (selectedIds.length === 0) {
-      alert("Please select at least one feedback.");
+      showError("Please select at least one feedback.");
       return;
     }
 
@@ -239,7 +249,7 @@ export default function FeedbackPage() {
       const result = await response.json();
 
       if (!result.success) {
-        alert(result.error);
+        showError(result.message || result.error);
         return;
       }
 
@@ -247,10 +257,10 @@ export default function FeedbackPage() {
 
       setSelectedIds([]);
 
-      alert(`${result.updated} feedback reclassified.`);
+      showSuccess(`${result.updated} feedback reclassified.`);
     } catch (error) {
       console.error(error);
-      alert("Failed to reclassify selected feedback.");
+      showError("Failed to reclassify selected feedback.");
     } finally {
       setLoadingAI(false);
     }
@@ -344,20 +354,44 @@ export default function FeedbackPage() {
           {/* Statistics Cards */}
           {/* ============================= */}
 
-          <FeedbackStats
-            total={feedback?.length || 0}
-            positive={
-              (feedback || []).filter((item) => item.sentiment === "POSITIVE")
-                .length
-            }
-            negative={
-              (feedback || []).filter((item) => item.sentiment === "NEGATIVE")
-                .length
-            }
-            pending={
-              (feedback || []).filter((item) => item.status === "NEW").length
-            }
-          />
+          {loading ? (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(4,1fr)",
+                gap: "20px",
+                marginBottom: "25px",
+              }}
+            >
+              {[1, 2, 3, 4].map((item) => (
+                <div
+                  key={item}
+                  style={{
+                    background: "#fff",
+                    padding: "25px",
+                    borderRadius: "15px",
+                  }}
+                >
+                  <Skeleton width="60%" height="18px" />
+
+                  <div style={{ height: "15px" }} />
+
+                  <Skeleton width="40%" height="35px" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <FeedbackStats
+              total={feedback?.length || 0}
+              positive={
+                feedback.filter((item) => item.sentiment === "POSITIVE").length
+              }
+              negative={
+                feedback.filter((item) => item.sentiment === "NEGATIVE").length
+              }
+              pending={feedback.filter((item) => item.status === "NEW").length}
+            />
+          )}
 
           {/* ============================= */}
           {/* Search & Filters */}
@@ -389,6 +423,8 @@ export default function FeedbackPage() {
             style={{
               display: "flex",
               justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "20px",
               alignItems: "center",
               marginBottom: "25px",
             }}
@@ -444,67 +480,104 @@ export default function FeedbackPage() {
           {/* Feedback Table */}
           {/* ============================= */}
 
-          <FeedbackTable
-            feedback={feedback}
-            loadFeedback={loadFeedback}
-            selectedIds={selectedIds}
-            toggleSelection={toggleSelection}
-            toggleSelectAll={toggleSelectAll}
-            onView={(item) => {
-              alert(
-                `Customer: ${item.user?.name || "Unknown"}\n\n` +
-                  `Message: ${item.message}\n\n` +
-                  `Theme: ${item.theme}\n\n` +
-                  `Channel: ${item.channel}\n\n` +
-                  `Status: ${item.status}\n\n` +
-                  `Sentiment: ${item.sentiment}`,
-              );
-            }}
-            onEdit={(item) => {
-              setEditingId(item.id);
+          {loading ? (
+            <div
+              style={{
+                background: "#FFFFFF",
+                padding: "25px",
+                borderRadius: "18px",
+                marginBottom: "20px",
+              }}
+            >
+              {[1, 2, 3, 4, 5].map((item) => (
+                <div
+                  key={item}
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "15px",
+                    alignItems: "center",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <Skeleton width="60px" height="20px" />
 
-              setForm({
-                message: item.message,
-                sentiment: item.sentiment,
-                status: item.status,
-                theme: item.theme,
-                channel: item.channel,
-              });
+                  <Skeleton width="300px" height="20px" />
 
-              window.scrollTo({
-                top: 0,
-                behavior: "smooth",
-              });
-            }}
-            onDelete={async (id) => {
-              const confirmDelete = window.confirm(
-                "Are you sure you want to delete this feedback?",
-              );
+                  <Skeleton width="100px" height="20px" />
 
-              if (!confirmDelete) return;
+                  <Skeleton width="100px" height="20px" />
 
-              try {
-                await fetch(`/api/feedback?id=${id}`, {
-                  method: "DELETE",
+                  <Skeleton width="120px" height="20px" />
+
+                  <Skeleton width="90px" height="20px" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <FeedbackTable
+              feedback={feedback}
+              loadFeedback={loadFeedback}
+              selectedIds={selectedIds}
+              toggleSelection={toggleSelection}
+              toggleSelectAll={toggleSelectAll}
+              onView={(item) => {
+                alert(
+                  `Customer: ${item.user?.name || "Unknown"}\n\n` +
+                    `Message: ${item.message}\n\n` +
+                    `Theme: ${item.theme}\n\n` +
+                    `Channel: ${item.channel}\n\n` +
+                    `Status: ${item.status}\n\n` +
+                    `Sentiment: ${item.sentiment}`,
+                );
+              }}
+              onEdit={(item) => {
+                setEditingId(item.id);
+
+                setForm({
+                  message: item.message,
+                  sentiment: item.sentiment,
+                  status: item.status,
+                  theme: item.theme,
+                  channel: item.channel,
                 });
 
-                loadFeedback();
+                window.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                });
+              }}
+              onDelete={async (id) => {
+                const confirmDelete = window.confirm(
+                  "Are you sure you want to delete this feedback?",
+                );
 
-                alert("Feedback deleted successfully.");
-              } catch (error) {
-                console.log(error);
-                alert("Delete failed.");
-              }
-            }}
-          />
+                if (!confirmDelete) return;
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={(page) => {
-              setCurrentPage(page);
-            }}
-          />
+                try {
+                  await fetch(`/api/feedback?id=${id}`, {
+                    method: "DELETE",
+                  });
+
+                  loadFeedback();
+
+                  showSuccess("Feedback deleted successfully.");
+                } catch (error) {
+                  console.log(error);
+                  showError("Delete failed.");
+                }
+              }}
+            />
+          )}
+          {!loading && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+              }}
+            />
+          )}
         </main>
 
         <Footer />

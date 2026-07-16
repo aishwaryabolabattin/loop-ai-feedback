@@ -109,23 +109,31 @@ const where = {
       take: limit,
     });
 
-    return NextResponse.json({
-      feedback,
-      totalPages,
-      totalRecords,
-      currentPage: page,
-    });
+    return NextResponse.json(
+  {
+    success: true,
+    message: "Feedback fetched successfully.",
+    data: feedback,
+    totalPages,
+    totalRecords,
+    currentPage: page,
+  },
+  {
+    status: 200,
+  }
+);
 
   } catch (error) {
 
-    return NextResponse.json(
-      {
-        error: error.message,
-      },
-      {
-        status: 500,
-      }
-    );
+  return NextResponse.json(
+  {
+    success: false,
+    message: error.message || "Internal Server Error",
+  },
+  {
+    status: 500,
+  }
+);
   }
 }
 // CREATE Feedback
@@ -234,10 +242,16 @@ export async function POST(request) {
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      feedback,
-    });
+    return NextResponse.json(
+  {
+    success: true,
+    message: "Feedback created successfully.",
+    data: feedback,
+  },
+  {
+    status: 201,
+  }
+);
   } catch (error) {
     console.error(
       "Create feedback error:",
@@ -245,14 +259,14 @@ export async function POST(request) {
     );
 
     return NextResponse.json(
-      {
-        success: false,
-        error: error.message,
-      },
-      {
-        status: 500,
-      },
-    );
+  {
+    success: false,
+    message: error.message || "Internal Server Error",
+  },
+  {
+    status: 500,
+  }
+);
   }
 }
 
@@ -280,13 +294,15 @@ export async function PATCH(request) {
   } catch (error) {
 
     return NextResponse.json(
-      {
-        error: error.message,
-      },
-      {
-        status: 500,
-      }
-    );
+  {
+    success: true,
+    message: "Feedback updated successfully.",
+    data: updated,
+  },
+  {
+    status: 200,
+  }
+);
 
   }
 }
@@ -308,20 +324,27 @@ export async function DELETE(request) {
 
     });
 
-    return NextResponse.json({
-      success: true,
-    });
+   return NextResponse.json(
+  {
+    success: true,
+    message: "Feedback deleted successfully.",
+  },
+  {
+    status: 200,
+  }
+);
 
   } catch (error) {
 
     return NextResponse.json(
-      {
-        error: error.message,
-      },
-      {
-        status: 500,
-      }
-    );
+  {
+    success: false,
+    message: error.message || "Internal Server Error",
+  },
+  {
+    status: 500,
+  }
+);
 
   }
 
@@ -357,14 +380,15 @@ export async function PUT(request) {
   } catch (error) {
 
     return NextResponse.json(
-      {
-        error: error.message,
-      },
-      {
-        status: 500,
-      }
-    );
-
+  {
+    success: true,
+    message: "Feedback updated successfully.",
+    data: feedback,
+  },
+  {
+    status: 200,
+  }
+);
   }
 
 }

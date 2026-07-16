@@ -67,16 +67,19 @@ export default function Sidebar() {
   return (
     <aside
       style={{
-        width: "270px",
-        height: "100vh",
+        width: "260px",
+        minHeight: "100vh",
         background: "#111827",
         color: "#fff",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        position: "sticky",
+        position: "fixed",
+        left: 0,
         top: 0,
-        overflowY: "auto",
+        zIndex: 999,
+        top: 0,
+        overflowX: "hidden",
         flexShrink: 0,
       }}
     >

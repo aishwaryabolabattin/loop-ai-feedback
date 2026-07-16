@@ -244,59 +244,48 @@ export async function GET() {
     // Send data to dashboard
     // =================================
 
-    return NextResponse.json({
-      success: true,
+    return NextResponse.json(
+  {
+    success: true,
+    message: "Dashboard loaded successfully.",
 
-      stats: {
-        totalFeedback,
+    stats: {
+      totalFeedback,
+      positive,
+      negative,
+      neutral,
+      pending,
+      resolved,
+      averageConfidence,
+      topTheme: topTheme.theme,
+      topThemeCount: topTheme.count,
+    },
 
-        // Keep these names because your
-        // current dashboard may use them.
-
-        positive,
-
-        negative,
-
-        neutral,
-
-        pending,
-
-        resolved,
-
-        averageConfidence,
-
-        topTheme:
-          topTheme.theme,
-
-        topThemeCount:
-          topTheme.count,
-      },
-
-      volumeData,
-
-      sentimentData,
-
-      themeData,
-
-      recentFeedback,
-    });
+    volumeData,
+    sentimentData,
+    themeData,
+    recentFeedback,
+  },
+  {
+    status: 200,
+  }
+);
   } catch (error) {
     console.error(
       "Dashboard API error:",
       error,
     );
 
-    return NextResponse.json(
-      {
-        success: false,
-
-        error:
-          error.message ||
-          "Dashboard data could not be loaded.",
-      },
-      {
-        status: 500,
-      },
-    );
+   return NextResponse.json(
+  {
+    success: false,
+    message:
+      error.message ||
+      "Dashboard data could not be loaded.",
+  },
+  {
+    status: 500,
+  }
+);
   }
 }

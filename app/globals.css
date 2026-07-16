@@ -135,3 +135,67 @@ font-size:24px;
 }
 
 }
+/* ================================= */
+/* Responsive Design */
+/* ================================= */
+
+*{
+box-sizing:border-box;
+}
+
+img{
+max-width:100%;
+height:auto;
+}
+
+table{
+width:100%;
+overflow-x:auto;
+display:block;
+}
+
+@media (max-width:1024px){
+
+main{
+padding:20px !important;
+}
+
+}
+
+@media (max-width:768px){
+
+main{
+padding:15px !important;
+}
+
+}
+
+@media (max-width:480px){
+
+main{
+padding:12px !important;
+}
+
+}
+/* ================================= */
+/* Accessibility */
+/* ================================= */
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 3px solid #4F46E5;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+[aria-hidden="true"] {
+  pointer-events: none;
+}
