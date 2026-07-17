@@ -282,8 +282,11 @@ export default function FeedbackPage() {
       <div
         style={{
           flex: 1,
+          marginLeft: "300px",
+          width: "calc(100% - 300px)",
           display: "flex",
           flexDirection: "column",
+          minWidth: 0,
         }}
       >
         <Header />
@@ -293,6 +296,8 @@ export default function FeedbackPage() {
             flex: 1,
             background: "#F3F4F6",
             padding: "30px",
+            overflowX: "auto",
+            overflowY: "auto",
           }}
         >
           {/* ============================= */}

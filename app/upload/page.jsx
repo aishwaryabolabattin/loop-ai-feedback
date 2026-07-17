@@ -42,23 +42,30 @@ export default function UploadPage() {
       <div
         style={{
           flex: 1,
+          marginLeft: "260px", // <-- Add this
           background: "#F3F4F6",
           display: "flex",
           flexDirection: "column",
+          minHeight: "100vh",
         }}
       >
         <Header />
 
-        <div style={{ padding: "30px", flex: 1 }}>
+        <main
+          style={{
+            flex: 1,
+            padding: "30px",
+          }}
+        >
           <CSVUploader />
 
           <UploadSummary total={3} imported={2} failed={1} skipped={0} />
 
           <UploadTable rows={uploadRows} />
-        </div>
-
-        <Footer />
+        </main>
       </div>
+
+      <Footer />
     </div>
   );
 }

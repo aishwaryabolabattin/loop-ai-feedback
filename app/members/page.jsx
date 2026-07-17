@@ -62,16 +62,21 @@ export default function MembersPage() {
       <div
         style={{
           flex: 1,
+          marginLeft: "260px",
           display: "flex",
           flexDirection: "column",
+          minWidth: 0,
+          minHeight: "100vh",
         }}
       >
         {/* Header */}
         <Header />
 
-        <div
+        <main
           style={{
+            flex: 1,
             padding: "35px",
+            overflowX: "hidden",
           }}
         >
           <h1
@@ -167,8 +172,7 @@ export default function MembersPage() {
               status="Active"
             />
           ))}
-        </div>
-
+        </main>
         <Footer />
       </div>
     </div>

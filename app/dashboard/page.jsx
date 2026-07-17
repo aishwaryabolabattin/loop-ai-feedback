@@ -121,9 +121,10 @@ export default function DashboardPage() {
       <div
         style={{
           flex: 1,
+          marginLeft: "260px",
+          minWidth: 0,
           display: "flex",
           flexDirection: "column",
-          minWidth: 0,
         }}
       >
         <Header />
@@ -132,6 +133,9 @@ export default function DashboardPage() {
           style={{
             flex: 1,
             padding: "30px",
+            background: "#F8FAFC",
+            overflowX: "auto",
+            overflowY: "auto",
           }}
         >
           {/* Dashboard heading */}
@@ -235,10 +239,6 @@ export default function DashboardPage() {
           ) : (
             <DashboardStats stats={stats} />
           )}
-
-          {/* Real statistics cards */}
-
-          <DashboardStats stats={stats} />
 
           {/* Real dashboard charts */}
 

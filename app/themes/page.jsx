@@ -150,6 +150,8 @@ export default function ThemesPage() {
       <div
         style={{
           flex: 1,
+          marginLeft: "300px",
+          width: "calc(100% - 300px)",
           display: "flex",
           flexDirection: "column",
           minWidth: 0,
@@ -160,7 +162,6 @@ export default function ThemesPage() {
         <main
           style={{
             flex: 1,
-            background: "#F3F4F6",
             padding: "35px",
           }}
         >

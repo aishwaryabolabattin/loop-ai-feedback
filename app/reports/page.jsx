@@ -66,23 +66,24 @@ export default function ReportsPage() {
   // ========================================
 
   async function handleGenerateReport() {
+    let toastId;
+
     try {
       setGeneratingReport(true);
 
       setError("");
 
       setSuccessMessage("");
-      const toastId = showLoading("Generating report...");
+
+      toastId = showLoading("Generating report...");
+
       const response = await fetch("/api/reports/generate", {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           days: selectedDays,
-
           title: `Voice-of-Customer Report — Last ${selectedDays} Days`,
         }),
       });
@@ -90,26 +91,24 @@ export default function ReportsPage() {
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error || "The report could not be generated.");
+        throw new Error(result.error);
       }
 
       dismissToast(toastId);
 
       showSuccess("Report generated successfully.");
 
-      // Reload saved reports.
       await loadReports();
-    } catch (requestError) {
-      console.error("Generate report error:", requestError);
+    } catch (error) {
+      if (toastId) {
+        dismissToast(toastId);
+      }
 
-      dismissToast(toastId);
-
-      showError(requestError.message || "The report could not be generated.");
+      showError(error.message);
     } finally {
       setGeneratingReport(false);
     }
   }
-
   return (
     <div style={pageLayout}>
       {/* Dashboard Sidebar */}
@@ -582,6 +581,8 @@ const pageLayout = {
 const rightContent = {
   flex: 1,
 
+  marginLeft: "260px",
+
   display: "flex",
 
   flexDirection: "column",
@@ -595,6 +596,10 @@ const mainContent = {
   padding: "35px",
 
   background: "#F3F4F6",
+
+  overflowX: "auto",
+
+  overflowY: "auto",
 };
 
 const pageHeading = {

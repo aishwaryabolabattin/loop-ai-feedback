@@ -1,36 +1,389 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Project LOOP
 
-## Getting Started
+An AI-powered Customer Feedback Intelligence Platform built using **Next.js**, **Prisma**, **PostgreSQL (Neon)**, **Anthropic Claude AI**, and **OpenAI Embeddings**.
 
-First, run the development server:
+---
+
+# 📖 Project Overview
+
+Project LOOP helps organizations collect, analyze, and understand customer feedback using Artificial Intelligence.
+
+The system automatically:
+
+- Classifies customer feedback using AI
+- Detects customer sentiment
+- Identifies common themes
+- Generates Voice of Customer (VoC) reports
+- Supports semantic search using Ask LOOP
+- Displays analytics on an interactive dashboard
+
+---
+
+# ✨ Features
+
+- 📊 Dashboard Analytics
+- 💬 Feedback Management (CRUD)
+- 🤖 AI Feedback Classification
+- 🔍 Ask LOOP (Semantic Search + RAG)
+- 📈 Analytics Dashboard
+- 🏷 Theme Detection
+- 📄 Voice of Customer Reports
+- 🖨 PDF Report Export
+- 👥 Member Management
+- ⚙ Settings
+- 📱 Responsive Design
+- ♿ Accessibility Support
+
+---
+
+# 🛠 Tech Stack
+
+## Frontend
+
+- Next.js
+- React
+- JavaScript
+- Tailwind CSS
+
+## Backend
+
+- Next.js API Routes
+- Prisma ORM
+
+## Database
+
+- PostgreSQL (Neon)
+
+## AI Services
+
+- Anthropic Claude API
+- OpenAI Embeddings
+
+## Deployment
+
+- Vercel
+
+---
+
+---
+
+# 🏗 System Architecture
+
+```text
+                    User
+                      │
+                      ▼
+          Next.js Frontend (React)
+                      │
+                      ▼
+            Next.js API Routes
+                      │
+        ┌─────────────┴─────────────┐
+        ▼                           ▼
+  Anthropic Claude AI        OpenAI Embeddings
+        │                           │
+        └─────────────┬─────────────┘
+                      ▼
+                 Prisma ORM
+                      │
+                      ▼
+            PostgreSQL (Neon Database)
+```
+
+---
+
+# 🔄 Application Flow
+
+```text
+Customer Feedback
+        │
+        ▼
+Feedback API
+        │
+        ▼
+Claude AI Classification
+        │
+        ▼
+Store in PostgreSQL
+        │
+        ▼
+Dashboard Analytics
+        │
+        ▼
+Ask LOOP
+        │
+        ▼
+Voice of Customer Report
+        │
+        ▼
+PDF Export
+```
+
+# 📂 Project Structure
+
+```text
+Project-LOOP/
+│
+├── app/
+│   ├── api/
+│   │   ├── ask-loop/
+│   │   ├── dashboard/
+│   │   ├── feedback/
+│   │   ├── reports/
+│   │   └── members/
+│   │
+│   ├── dashboard/
+│   ├── feedback/
+│   ├── reports/
+│   ├── ask-loop/
+│   ├── analytics/
+│   ├── themes/
+│   ├── members/
+│   ├── settings/
+│   ├── globals.css
+│   └── layout.tsx
+│
+├── components/
+│   ├── dashboard/
+│   ├── Sidebar.jsx
+│   ├── Header.jsx
+│   ├── Footer.jsx
+│   ├── ExportReportButton.jsx
+│
+├── lib/
+│   ├── prisma.js
+│   ├── ai.js
+│   ├── embeddings.js
+│   └── toast.js
+│
+├── prisma/
+│   ├── schema.prisma
+│   └── seed.js
+│
+├── public/
+│   ├── screenshots/
+│   └── icons/
+│
+├── README.md
+├── package.json
+└── next.config.js
+```
+
+---
+
+# 📦 Project Modules
+
+| Module    | Description                               |
+| --------- | ----------------------------------------- |
+| Dashboard | Displays AI-powered analytics and charts  |
+| Feedback  | Manage customer feedback (CRUD)           |
+| Analytics | Visualize customer sentiment and trends   |
+| Themes    | AI-generated feedback themes              |
+| Ask LOOP  | Semantic search with AI-generated answers |
+| Reports   | Generate Voice of Customer reports        |
+| Members   | Workspace user management                 |
+| Settings  | Application settings                      |
+
+---
+
+# 🗄 Database Design
+
+```text
+Workspace
+│
+├── Users
+│
+├── Feedback
+│
+└── Reports
+```
+
+### Main Tables
+
+- Workspace
+- User
+- Feedback
+- Report
+
+# ⚙ Installation
+
+Clone the repository
+
+```bash
+git clone https://github.com/YOUR_GITHUB_USERNAME/project-loop.git
+```
+
+Go to the project folder
+
+```bash
+cd project-loop
+```
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Create environment variables
+
+```text
+.env.local
+```
+
+Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+# 🔑 Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+Create a `.env.local` file and add:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+DATABASE_URL=
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+DIRECT_URL=
 
-## Deploy on Vercel
+ANTHROPIC_API_KEY=
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+OPENAI_API_KEY=
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+NEXTAUTH_SECRET=
+
+NEXTAUTH_URL=http://localhost:3000
+```
+
+---
+
+# 🗄 Database Setup
+
+Generate Prisma Client
+
+```bash
+npx prisma generate
+```
+
+Push schema to database
+
+```bash
+npx prisma db push
+```
+
+(Optional) Seed the database
+
+```bash
+node prisma/seed.js
+```
+
+---
+
+# 🚀 Production
+
+Build the application
+
+```bash
+npm run build
+```
+
+Start the production server
+
+```bash
+npm start
+```
+
+---
+
+# 🌐 Deployment
+
+Deploy using **Vercel**.
+
+Add these Environment Variables in the Vercel Dashboard:
+
+- DATABASE_URL
+- DIRECT_URL
+- ANTHROPIC_API_KEY
+- OPENAI_API_KEY
+- NEXTAUTH_SECRET
+- NEXTAUTH_URL
+
+---
+
+# 📸 Screenshots
+
+## Dashboard
+
+![Dashboard](public/screenshots/dashboard.png)
+
+---
+
+## Feedback
+
+![Feedback](public/screenshots/feedback.png)
+
+---
+
+## Analytics
+
+![Analytics](public/screenshots/analytics.png)
+
+---
+
+## Themes
+
+![Themes](public/screenshots/themes.png)
+
+---
+
+## Ask LOOP
+
+![Ask LOOP](public/screenshots/ask-loop.png)
+
+---
+
+## Reports
+
+![Reports](public/screenshots/reports.png)
+
+---
+
+## Report Details
+
+![Report Details](public/screenshots/report-details.png)
+
+---
+
+## Members
+
+![Members](public/screenshots/members.png)
+
+---
+
+## Settings
+
+![Settings](public/screenshots/settings.png)
+
+---
+
+# 👩‍💻 Developer
+
+**Aishwarya Bolabattin**
+
+B.Tech – Computer Science Engineering
+
+Software Developer
+
+---
+
+# 📜 License
+
+This project is developed for educational and portfolio purposes.

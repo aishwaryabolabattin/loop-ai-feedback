@@ -68,19 +68,17 @@ export default function Sidebar() {
     <aside
       style={{
         width: "260px",
-        minHeight: "100vh",
+        height: "100vh",
         background: "#111827",
         color: "#fff",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
         position: "fixed",
         left: 0,
         top: 0,
         zIndex: 999,
-        top: 0,
+        overflowY: "auto",
         overflowX: "hidden",
-        flexShrink: 0,
       }}
     >
       <div>
@@ -117,6 +115,8 @@ export default function Sidebar() {
 
         <div
           style={{
+            flex: 1,
+            overflowY: "auto",
             padding: "20px",
           }}
         >
@@ -160,6 +160,7 @@ export default function Sidebar() {
 
       <div
         style={{
+          marginTop: "auto",
           padding: "20px",
           borderTop: "1px solid rgba(255,255,255,.08)",
         }}
@@ -184,9 +185,7 @@ export default function Sidebar() {
               fontWeight: "700",
               fontSize: "18px",
             }}
-          >
-            A
-          </div>
+          ></div>
 
           <div>
             <div

@@ -103,9 +103,12 @@ export default function AskLoopPage() {
       <div
         style={{
           flex: 1,
+          marginLeft: "260px",
           display: "flex",
           flexDirection: "column",
+          minHeight: "100vh",
           minWidth: 0,
+          background: "#F3F4F6",
         }}
       >
         <Header />
@@ -115,6 +118,7 @@ export default function AskLoopPage() {
             flex: 1,
             padding: "35px",
             background: "#F3F4F6",
+            overflowX: "hidden",
           }}
         >
           {/* Page Heading */}

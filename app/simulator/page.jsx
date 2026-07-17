@@ -58,8 +58,11 @@ export default function SimulatorPage() {
       <div
         style={{
           flex: 1,
+          marginLeft: "300px",
+          width: "calc(100% - 300px)",
           display: "flex",
           flexDirection: "column",
+          minWidth: 0,
         }}
       >
         <Header />
@@ -67,7 +70,6 @@ export default function SimulatorPage() {
         <main
           style={{
             flex: 1,
-            background: "#F3F4F6",
             padding: "35px",
           }}
         >

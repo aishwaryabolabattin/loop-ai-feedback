@@ -120,9 +120,12 @@ export default function TrendsPage() {
       <div
         style={{
           flex: 1,
+          marginLeft: "260px", // Add this
           display: "flex",
           flexDirection: "column",
+          minHeight: "100vh",
           minWidth: 0,
+          background: "#F3F4F6",
         }}
       >
         <Header />
@@ -131,6 +134,7 @@ export default function TrendsPage() {
           style={{
             flex: 1,
             padding: "30px",
+            overflowX: "hidden",
           }}
         >
           {/* ============================== */}

@@ -1,124 +1,131 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log("🌱 Seeding database...");
 
-  // Hash passwords
-  const adminPassword = await bcrypt.hash("admin123", 10);
-  const analystPassword = await bcrypt.hash("analyst123", 10);
-  const viewerPassword = await bcrypt.hash("viewer123", 10);
+  // Clean existing data
+  await prisma.feedback.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.workspace.deleteMany();
 
-  // Workspace
-  const workspace = await prisma.workspace.upsert({
-    where: {
-      id: 1,
-    },
-    update: {},
-    create: {
-      id: 1,
+  // Create Workspace
+  const workspace = await prisma.workspace.create({
+    data: {
       name: "Project LOOP Workspace",
     },
   });
 
-  console.log("✅ Workspace Ready");
-
-  // Admin
-  const admin = await prisma.user.upsert({
-    where: {
-      email: "admin@loop.dev",
-    },
-    update: {},
-    create: {
-      name: "Aishwarya",
-      email: "admin@loop.dev",
-      password: adminPassword,
+  // Create Users
+  const admin = await prisma.user.create({
+    data: {
+      name: "Aishwarya Bolabattin",
+      email: "admin@projectloop.com",
+      password: "admin123",
       role: "ADMIN",
       workspaceId: workspace.id,
     },
   });
 
-  // Analyst
-  const analyst = await prisma.user.upsert({
-    where: {
-      email: "analyst@loop.dev",
-    },
-    update: {},
-    create: {
-      name: "Nasiroddin",
-      email: "analyst@loop.dev",
-      password: analystPassword,
+  await prisma.user.create({
+    data: {
+      name: "Rahul Sharma",
+      email: "analyst@projectloop.com",
+      password: "analyst123",
       role: "ANALYST",
       workspaceId: workspace.id,
     },
   });
 
-  // Viewer
-  const viewer = await prisma.user.upsert({
-    where: {
-      email: "viewer@loop.dev",
-    },
-    update: {},
-    create: {
+  await prisma.user.create({
+    data: {
       name: "Viewer User",
-      email: "viewer@loop.dev",
-      password: viewerPassword,
+      email: "viewer@projectloop.com",
+      password: "viewer123",
       role: "VIEWER",
       workspaceId: workspace.id,
     },
   });
 
-  console.log("✅ Users Ready");
+  // Create Feedback
+  await prisma.feedback.createMany({
+    data: [
+      {
+        message: "Excellent customer support and quick response.",
+        sentiment: "POSITIVE",
+        status: "RESOLVED",
+        theme: "Support",
+        channel: "Website",
+        confidence: 0.98,
+        summary: "Customer appreciated support.",
+        workspaceId: workspace.id,
+        userId: admin.id,
+      },
+      {
+        message: "Delivery was delayed by three days.",
+        sentiment: "NEGATIVE",
+        status: "NEW",
+        theme: "Delivery",
+        channel: "Email",
+        confidence: 0.95,
+        summary: "Customer unhappy with delivery.",
+        workspaceId: workspace.id,
+        userId: admin.id,
+      },
+      {
+        message: "Product quality is excellent.",
+        sentiment: "POSITIVE",
+        status: "RESOLVED",
+        theme: "Quality",
+        channel: "Website",
+        confidence: 0.97,
+        summary: "Customer liked product quality.",
+        workspaceId: workspace.id,
+        userId: admin.id,
+      },
+      {
+        message: "The mobile app crashes frequently.",
+        sentiment: "NEGATIVE",
+        status: "IN_PROGRESS",
+        theme: "Application",
+        channel: "Mobile App",
+        confidence: 0.96,
+        summary: "Crash issue reported.",
+        workspaceId: workspace.id,
+        userId: admin.id,
+      },
+      {
+        message: "Pricing is reasonable compared to competitors.",
+        sentiment: "POSITIVE",
+        status: "RESOLVED",
+        theme: "Pricing",
+        channel: "Website",
+        confidence: 0.93,
+        summary: "Customer satisfied with pricing.",
+        workspaceId: workspace.id,
+        userId: admin.id,
+      },
+      {
+        message: "Packaging arrived damaged.",
+        sentiment: "NEGATIVE",
+        status: "NEW",
+        theme: "Packaging",
+        channel: "Courier",
+        confidence: 0.94,
+        summary: "Packaging damaged during delivery.",
+        workspaceId: workspace.id,
+        userId: admin.id,
+      },
+    ],
+  });
 
-  // Check if feedback already exists
-  const feedbackCount = await prisma.feedback.count();
-
-  if (feedbackCount === 0) {
-    await prisma.feedback.createMany({
-      data: [
-        {
-          message: "Excellent customer support.",
-          sentiment: "POSITIVE",
-          status: "NEW",
-          theme: "Support",
-          channel: "Email",
-          workspaceId: workspace.id,
-          userId: admin.id,
-        },
-        {
-          message: "Delivery was delayed.",
-          sentiment: "NEGATIVE",
-          status: "REVIEW",
-          theme: "Delivery",
-          channel: "Website",
-          workspaceId: workspace.id,
-          userId: analyst.id,
-        },
-        {
-          message: "Application UI is very clean.",
-          sentiment: "POSITIVE",
-          status: "ACTIONED",
-          theme: "UI",
-          channel: "Mobile",
-          workspaceId: workspace.id,
-          userId: viewer.id,
-        },
-      ],
-    });
-
-    console.log("✅ Feedback Created");
-  } else {
-    console.log("ℹ️ Feedback already exists");
-  }
-
-  console.log("🎉 Database Seeded Successfully");
+  console.log("✅ Database seeded successfully.");
 }
 
 main()
-  .catch((e) => {
-    console.error("❌ Error while seeding:", e);
+  .catch((error) => {
+    console.error(error);
     process.exit(1);
   })
   .finally(async () => {
