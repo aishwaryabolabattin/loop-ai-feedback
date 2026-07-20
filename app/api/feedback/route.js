@@ -210,37 +210,47 @@ export async function POST(request) {
     // ==================================
     // Save Feedback
     // ==================================
+    console.log("workspaceId =", workspaceId);
+console.log("userId =", userId);
+
+const workspace = await prisma.workspace.findUnique({
+  where: { id: workspaceId },
+});
+
+const user = await prisma.user.findUnique({
+  where: { id: userId },
+});
+
+console.log("Workspace Found:", workspace);
+console.log("User Found:", user);
 
     const feedback = await prisma.feedback.create({
-      data: {
-        message: body.message,
+  data: {
+    message: body.message,
+    sentiment: ai.sentiment,
+    status: ai.status,
+    theme: ai.theme,
+    channel: body.channel,
+    summary: ai.summary,
+    confidence: ai.confidence,
 
-        sentiment: ai.sentiment,
-
-        status: ai.status,
-
-        theme: ai.theme,
-
-        channel: body.channel,
-
-        summary: ai.summary,
-
-        confidence: ai.confidence,
-
-        workspaceId,
-
-        userId,
-
-        // Day 15: Save embedding results
-        embedding,
-
-        embeddedAt: embedding ? new Date() : null,
-
-        embeddingModel: embedding
-          ? EMBEDDING_MODEL
-          : null,
+    workspace: {
+      connect: {
+        id: workspaceId,
       },
-    });
+    },
+
+    user: {
+      connect: {
+        id: userId,
+      },
+    },
+
+    embedding,
+    embeddedAt: embedding ? new Date() : null,
+    embeddingModel: embedding ? EMBEDDING_MODEL : null,
+  },
+});
 
     return NextResponse.json(
   {
@@ -292,19 +302,18 @@ export async function PATCH(request) {
     return NextResponse.json(updated);
 
   } catch (error) {
+  console.error("Update feedback error:", error);
 
-    return NextResponse.json(
-  {
-    success: true,
-    message: "Feedback updated successfully.",
-    data: updated,
-  },
-  {
-    status: 200,
-  }
-);
-
-  }
+  return NextResponse.json(
+    {
+      success: false,
+      message: error.message,
+    },
+    {
+      status: 500,
+    }
+  );
+}
 }
 // DELETE Feedback
 
@@ -377,18 +386,18 @@ export async function PUT(request) {
 
     return NextResponse.json(feedback);
 
-  } catch (error) {
+  }catch (error) {
+  console.error("Edit feedback error:", error);
 
-    return NextResponse.json(
-  {
-    success: true,
-    message: "Feedback updated successfully.",
-    data: feedback,
-  },
-  {
-    status: 200,
-  }
-);
-  }
+  return NextResponse.json(
+    {
+      success: false,
+      message: error.message,
+    },
+    {
+      status: 500,
+    }
+  );
+}
 
 }

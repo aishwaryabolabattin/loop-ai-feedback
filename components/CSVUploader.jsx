@@ -1,12 +1,15 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Papa from "papaparse";
 
 export default function CSVUploader() {
   const fileInputRef = useRef(null);
 
   const [fileName, setFileName] = useState("");
   const [dragging, setDragging] = useState(false);
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleFile = (file) => {
     if (!file) return;
@@ -16,6 +19,7 @@ export default function CSVUploader() {
       return;
     }
 
+    setFile(file);
     setFileName(file.name);
   };
 
@@ -27,6 +31,46 @@ export default function CSVUploader() {
     handleFile(file);
   };
 
+  const uploadCSV = () => {
+    if (!file) {
+      alert("Please select a CSV file.");
+      return;
+    }
+
+    setLoading(true);
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+
+      complete: async (results) => {
+        try {
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              feedbacks: results.data,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            alert(`Imported ${data.imported} records successfully.`);
+          } else {
+            alert(data.message);
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Upload failed.");
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
+  };
   return (
     <div
       style={{
@@ -153,6 +197,7 @@ export default function CSVUploader() {
           </div>
 
           <button
+            onClick={uploadCSV}
             style={{
               background: "#10B981",
               color: "#ffffff",
@@ -163,7 +208,7 @@ export default function CSVUploader() {
               fontWeight: "700",
             }}
           >
-            Upload CSV
+            {loading ? "Uploading..." : "Upload CSV"}
           </button>
         </div>
       )}

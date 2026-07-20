@@ -41,8 +41,8 @@ export default function UploadPage() {
 
       <div
         style={{
-          flex: 1,
-          marginLeft: "260px", // <-- Add this
+          width: "calc(100% - 260px)",
+          marginLeft: "260px",
           background: "#F3F4F6",
           display: "flex",
           flexDirection: "column",
@@ -63,9 +63,9 @@ export default function UploadPage() {
 
           <UploadTable rows={uploadRows} />
         </main>
-      </div>
 
-      <Footer />
+        <Footer />
+      </div>
     </div>
   );
 }

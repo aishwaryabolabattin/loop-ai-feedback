@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 export default function Sidebar() {
   const pathname = usePathname();
-
+  const userName = "Aishwarya";
   const menuItems = [
     {
       title: "Dashboard",
@@ -185,7 +185,9 @@ export default function Sidebar() {
               fontWeight: "700",
               fontSize: "18px",
             }}
-          ></div>
+          >
+            {userName.charAt(0).toUpperCase()}
+          </div>
 
           <div>
             <div
