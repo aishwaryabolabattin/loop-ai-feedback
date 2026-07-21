@@ -535,20 +535,18 @@ const layout = {
 
 const rightContent = {
   flex: 1,
-
   display: "flex",
-
   flexDirection: "column",
-
   minWidth: 0,
+
+  marginLeft: "260px", // Sidebar width
 };
 
 const mainContent = {
   flex: 1,
-
-  padding: "32px",
-
+  padding: "30px",
   background: "#F3F4F6",
+  overflowX: "hidden",
 };
 
 const topSection = {
@@ -614,8 +612,8 @@ const printButton = {
 };
 
 const reportContainer = {
-  maxWidth: "1250px",
-
+  width: "100%",
+  maxWidth: "1350px",
   margin: "0 auto",
 };
 
@@ -635,13 +633,9 @@ const heroCard = {
 
 const heroTop = {
   display: "flex",
-
   justifyContent: "space-between",
-
-  alignItems: "flex-start",
-
+  alignItems: "center",
   gap: "20px",
-
   flexWrap: "wrap",
 };
 
@@ -731,12 +725,8 @@ const informationValue = {
 
 const statisticsGrid = {
   display: "grid",
-
-  gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
-
+  gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))",
   gap: "20px",
-
-  marginBottom: "24px",
 };
 
 const statisticCard = {
