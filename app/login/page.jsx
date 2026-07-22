@@ -10,19 +10,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
-    const userEmail = email.trim().toLowerCase();
-
-    if (
-      userEmail === "admin@loop.dev" ||
-      userEmail === "analyst@loop.dev" ||
-      userEmail === "viewer@loop.dev"
-    ) {
-      router.push("/dashboard");
-    } else {
-      alert(
-        "Invalid Email!\n\nUse:\nadmin@loop.dev\nanalyst@loop.dev\nviewer@loop.dev",
-      );
+    if (!email || !password) {
+      alert("Please enter email and password");
+      return;
     }
+
+    router.push("/dashboard");
   };
 
   return (
