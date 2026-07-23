@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
 import {
@@ -6,8 +6,8 @@ import {
 } from "@/lib/semanticSearch";
 
 // Create OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
 });
 
 // ==================================
@@ -82,64 +82,36 @@ Channel: ${feedback.channel}
     // Step 3: Generate grounded answer
     // ==================================
 
-    const completion =
-      await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-
-        temperature: 0.2,
-
-        messages: [
-          {
-            role: "system",
-
-            content: `
+    const prompt = `
 You are Ask LOOP, an AI customer-feedback analyst.
 
-Answer the user's question using only the customer feedback records provided in the context.
+Answer the user's question using ONLY the customer feedback below.
 
 Rules:
+1. Use only the provided feedback.
+2. Do not invent information.
+3. Add citations like [1], [2], [3].
+4. If information is insufficient, clearly say so.
 
-1. Use only the provided customer feedback.
-
-2. Do not use outside information.
-
-3. Do not invent customer feedback or unsupported facts.
-
-4. Add citation numbers such as [1], [2], or [3] after every supported statement.
-
-5. Use only citation numbers available in the provided feedback context.
-
-6. Keep the answer clear, concise, and professional.
-
-7. If the feedback does not contain enough information, clearly state that there is insufficient information.
-            `.trim(),
-          },
-
-          {
-            role: "user",
-
-            content: `
 Question:
-
 ${question}
 
-Customer feedback context:
-
+Customer Feedback:
 ${context}
+`;
 
-Provide a grounded answer with citations.
-            `.trim(),
-          },
-        ],
-      });
+const result = await ai.models.generateContent({
+  model: "gemini-2.5-flash",
+  contents: prompt,
+});
 
     // ==================================
     // Step 4: Read AI answer
     // ==================================
 
     const answer =
-      completion.choices[0]?.message?.content?.trim() ||
-      "Ask LOOP could not generate an answer.";
+  result.text ||
+  "Ask LOOP could not generate an answer.";
 
     // ==================================
     // Step 5: Prepare citation records
