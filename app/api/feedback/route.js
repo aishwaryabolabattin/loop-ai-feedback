@@ -1,11 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { classifyFeedback } from "@/lib/ai";
-import {
-  createEmbedding,
-  createFeedbackEmbeddingText,
-  EMBEDDING_MODEL,
-} from "@/lib/embeddings";
+
 
 // GET Feedback (Pagination + Search)
 
@@ -186,26 +182,7 @@ export async function POST(request) {
     // Day 15: Generate Embedding
     // ==================================
 
-    let embedding = null;
-
-    try {
-      // Combine the feedback information into one text value.
-      const embeddingText = createFeedbackEmbeddingText({
-        message: body.message,
-        sentiment: ai.sentiment,
-        theme: ai.theme,
-        summary: ai.summary,
-        channel: body.channel,
-      });
-
-      // Generate the OpenAI embedding.
-      embedding = await createEmbedding(embeddingText);
-    } catch (embeddingError) {
-      console.error(
-        "OpenAI embedding generation failed:",
-        embeddingError,
-      );
-    }
+     
 
     // ==================================
     // Save Feedback
@@ -246,10 +223,7 @@ console.log("User Found:", user);
       },
     },
 
-    embedding,
-    embeddedAt: embedding ? new Date() : null,
-    embeddingModel: embedding ? EMBEDDING_MODEL : null,
-  },
+  }   
 });
 
     return NextResponse.json(
