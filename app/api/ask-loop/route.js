@@ -1,13 +1,12 @@
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
-import {
-  retrieveRelevantFeedback,
-} from "@/lib/semanticSearch";
+import { retrieveRelevantFeedback } from "@/lib/semanticSearch";
 
 // Create OpenAI client
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+const client = new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
 });
 
 // ==================================
@@ -38,15 +37,11 @@ export async function POST(request) {
     // Step 1: Find relevant feedback
     // ==================================
 
-    const relevantFeedback =
-      await retrieveRelevantFeedback(
-        question,
-        {
-          workspaceId: 1,
-          limit: 5,
-          minimumSimilarity: 0.2,
-        },
-      );
+    const relevantFeedback = await retrieveRelevantFeedback(question, {
+      workspaceId: 1,
+      limit: 5,
+      minimumSimilarity: 0.2,
+    });
 
     // If no relevant feedback is found
     if (relevantFeedback.length === 0) {
@@ -100,9 +95,14 @@ Customer Feedback:
 ${context}
 `;
 
-const result = await ai.models.generateContent({
-  model: "gemini-2.5-flash",
-  contents: prompt,
+    const completion = await client.chat.completions.create({
+  model: "inclusionai/ling-3.0-flash:free",
+  messages: [
+    {
+      role: "user",
+      content: prompt,
+    },
+  ],
 });
 
     // ==================================
@@ -110,40 +110,38 @@ const result = await ai.models.generateContent({
     // ==================================
 
     const answer =
-  result.text ||
-  "Ask LOOP could not generate an answer.";
+  completion.choices[0]?.message?.content ||
+  "No answer generated.";
 
     // ==================================
     // Step 5: Prepare citation records
     // ==================================
 
-    const citations = relevantFeedback.map(
-      (feedback, index) => {
-        return {
-          citationNumber: index + 1,
+    const citations = relevantFeedback.map((feedback, index) => {
+      return {
+        citationNumber: index + 1,
 
-          id: feedback.id,
+        id: feedback.id,
 
-          message: feedback.message,
+        message: feedback.message,
 
-          theme: feedback.theme,
+        theme: feedback.theme,
 
-          sentiment: feedback.sentiment,
+        sentiment: feedback.sentiment,
 
-          status: feedback.status,
+        status: feedback.status,
 
-          channel: feedback.channel,
+        channel: feedback.channel,
 
-          summary: feedback.summary,
+        summary: feedback.summary,
 
-          confidence: feedback.confidence,
+        confidence: feedback.confidence,
 
-          similarity: feedback.similarity,
+        similarity: feedback.similarity,
 
-          createdAt: feedback.createdAt,
-        };
-      },
-    );
+        createdAt: feedback.createdAt,
+      };
+    });
 
     // ==================================
     // Step 6: Return answer and sources
@@ -159,18 +157,13 @@ const result = await ai.models.generateContent({
       citations,
     });
   } catch (error) {
-    console.error(
-      "Ask LOOP API Error:",
-      error,
-    );
+    console.error("Ask LOOP API Error:", error);
 
     return NextResponse.json(
       {
         success: false,
 
-        error:
-          error.message ||
-          "Ask LOOP could not answer the question.",
+        error: error.message || "Ask LOOP could not answer the question.",
       },
       {
         status: 500,

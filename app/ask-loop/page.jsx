@@ -33,26 +33,29 @@ export default function AskLoopPage() {
       return;
     }
 
+    let toastId; // ✅ Declare here
+
     try {
       setLoading(true);
       setError("");
       setAnswer("");
       setCitations([]);
 
-      const toastId = showLoading("Searching feedback...");
+      toastId = showLoading("Searching feedback...");
       const response = await fetch("/api/ask-loop", {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           question: cleanedQuestion,
         }),
       });
 
-      const result = await response.json();
+      const text = await response.text();
+      console.log("API Response:", text);
+
+      const result = JSON.parse(text);
 
       if (!response.ok || !result.success) {
         throw new Error(
@@ -60,17 +63,21 @@ export default function AskLoopPage() {
         );
       }
 
-      setAnswer(result.answer || "");
       dismissToast(toastId);
+
+      setAnswer(result.answer || "");
+      setCitations(Array.isArray(result.citations) ? result.citations : []);
 
       showSuccess("Answer generated successfully.");
-
-      setCitations(Array.isArray(result.citations) ? result.citations : []);
     } catch (requestError) {
       console.error("Ask LOOP request error:", requestError);
-      dismissToast(toastId);
+
+      if (toastId) {
+        dismissToast(toastId);
+      }
 
       showError(requestError.message || "Something went wrong.");
+
       setError(
         requestError.message ||
           "Something went wrong while generating the answer.",
@@ -79,7 +86,6 @@ export default function AskLoopPage() {
       setLoading(false);
     }
   }
-
   // Put an example question into the input box
   function useExampleQuestion(exampleQuestion) {
     setQuestion(exampleQuestion);
